@@ -2,6 +2,8 @@
 #define USER_H_
 
 #include <iostream>
+#include <sstream>
+#include <fstream>
 #include <string>
 
 using namespace std;
@@ -10,15 +12,16 @@ using namespace std;
 class User{
 private:
 	string loginName;
+	string password;
 	string institution;
+	bool isLoggedIn = false;
 	int monthsLastPaid;
 public:
-	User(string name){
-		loginName = name;
-		//9999 months is just a random big number bigger than 5 years
-		monthsLastPaid=9999;
-	}
+	User(stringstream& s);
 	string getLoginName();
+	string getPassword();
+	string getInstitution();
+	void login();
 
 };
 

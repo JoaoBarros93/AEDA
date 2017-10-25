@@ -105,13 +105,14 @@ void APIC::menu2(APIC apic) {
 }
 
 bool APIC::findSemicolon(string stringToSearch) {
-	basic_string<char>::size_type index1, index2;
+	basic_string<char>::size_type index1, index2, index3;
 	static const basic_string<char>::size_type npos = -1;
 	index1 = stringToSearch.find(';');
 	index2 = stringToSearch.find(',');
+	index3 = stringToSearch.find(' ');
 
-	if (index1 != npos || index2 != npos) {
-		cout << "ERROR! Cannot contain semicolon or comma! " << endl;
+	if (index1 != npos || index2 != npos || index3 != npos ) {
+		cout << "ERROR! Wrong input! " << endl;
 		return true;
 	} else
 		return false;
@@ -124,14 +125,21 @@ bool APIC::login(int n, APIC apic) {
 	string username, password;
 	int loginTry = n;
 
-	cout << "Enter username: ";
+	cout << endl << "Enter username (semicolon or comma will exit):";
 	cin >> username;
 	cin.clear();
 	cin.ignore(10000, '\n');
-	cout << "Enter password: ";
+	//try to find ";" in username
+		if (findSemicolon(username))
+			menu1(apic);
+
+	cout << "Enter password (semicolon or comma will exit) ";
 	cin >> password;
 	cin.clear();
 	cin.ignore(10000, '\n');
+	//try to find ";" in username
+		if (findSemicolon(password))
+			menu1(apic);
 
 	for (unsigned int i = 0; i < users.size(); i++) {
 		if (users[i].getLoginName() == username
@@ -162,7 +170,7 @@ bool APIC::regist(APIC apic) {
 	int pick;
 	stringstream ss;
 
-	cout << "Select your username (semicolon will exit): " << endl;
+	cout << "Select your username (semicolon or comma will exit): " << endl;
 	cin >> username;
 	cin.clear();
 	cin.ignore(10000, '\n');
@@ -179,7 +187,7 @@ bool APIC::regist(APIC apic) {
 		}
 	}
 
-	cout << "Select your password (semicolon will exit): " << endl;
+	cout << "Select your password (semicolon or comma will exit): " << endl;
 	cin >> password;
 	cin.clear();
 	cin.ignore(10000, '\n');
@@ -187,20 +195,20 @@ bool APIC::regist(APIC apic) {
 	if (findSemicolon(password))
 		menu1(apic);
 
-	cout << "Select your institution (semicolon will exit): " << endl;
+	cout << "Select your institution (semicolon or comma will exit): " << endl;
 	cin >> institution;
 	cin.clear();
 	cin.ignore(10000, '\n');
-	//try to find ";" in username
+	//try to find ";" in institution
 	if (findSemicolon(institution))
 		menu1(apic);
 
 	do {
-		cout << "Select your area of interest (semicolon will exit): " << endl;
+		cout << "Select your area of interest (semicolon or comma will exit): " << endl;
 		cin >> area;
 		cin.clear();
 		cin.ignore(10000, '\n');
-		//try to find ";" in password
+		//try to find ";" in area
 		if (findSemicolon(area))
 			menu1(apic);
 
@@ -213,7 +221,7 @@ bool APIC::regist(APIC apic) {
 
 	ss << username << ";";
 	ss << password << ";";
-	ss << institution;
+	ss << institution << ";";
 
 	//file with users names for output
 	ofstream usersFile;
@@ -263,19 +271,17 @@ void APIC::printUsers() {
 void APIC::printUsersComplete() {
 	cout << endl << "Complete info of all users: " << endl << endl;
 	for (unsigned int i = 0; i < users.size(); i++) {
-		cout << "User " << i+1 << " Login Name: ";
-		cout << users[i].getLoginName() << endl;
-		cout << "User " << i+1 << " Institution: ";
-		cout << users[i].getInstitution() << endl;
-		cout << "User " << i+1 <<" Scientific areas of interest: " << endl;
+		cout << "----" << "User" << i + 1 << "----" << endl;
+		cout << "Login name: " << users[i].getLoginName() << endl;
+		cout << "Institution: " << users[i].getInstitution() << endl;
 		for (unsigned int j = 0; j < users[i].getVectorAreas().size(); j++) {
-			cout << users[i].getVectorAreas()[j] << endl;
+			cout << "Area" << j+1 << " " << users[i].getVectorAreas()[j] << endl;
 		}
-		cout << endl ;
+		cout << endl;
 	}
 }
 
-void APIC::searchUser(){
+void APIC::searchUser() {
 	string user;
 	cout << "Please, insert the login name of the user you are trying to find: "
 			<< endl;
@@ -284,7 +290,8 @@ void APIC::searchUser(){
 	cin.ignore(10000, '\n');
 
 	for (unsigned int i = 0; i < users.size(); i++) {
-		if (users[i].getLoginName()==user) {
+
+		if (users[i].getLoginName() == user) {
 			cout << "User found! " << endl;
 			cout << "Login name: " << users[i].getLoginName() << endl;
 			cout << "Institution: " << users[i].getInstitution() << endl;
@@ -295,4 +302,3 @@ void APIC::searchUser(){
 		}
 	}
 }
-

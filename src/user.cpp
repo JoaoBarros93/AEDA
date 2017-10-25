@@ -42,7 +42,6 @@ User::User(stringstream& s) {
 	while (getline(iss, newArea, ';')) {
 		this->areas.push_back(newArea);
 	}
-
 	//9999 is just a random big number of months, so it can be bigger than 5 years
 	this->dataPay = 9999;
 	this->loggedIn = false;

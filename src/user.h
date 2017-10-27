@@ -8,6 +8,7 @@
 #include <vector>
 #include <cstring>
 #include <sstream>
+#include "area.h"
 
 using namespace std;
 
@@ -19,18 +20,22 @@ private:
 	bool loggedIn;
 	bool quota;
 	int dataPay;
-	vector <string> areas;
+	vector <string> areasString;
+	vector <Area> areas;
 public:
 	User();
-	User(stringstream& s);
+	User(stringstream& s,vector<Area > areas);
 	string getLoginName();
 	string getPassword();
 	string getInstitution();
 	bool getLoggedIn();
-	vector <string> getVectorAreas();
+	vector <Area> getVectorAreas();
+	vector <string> getVectorAreasString();
 	void login();
 	void logout();
-
+	void printAreas();
+	Area stringToArea(string areaString, vector<Area > areas);
+	void insertArea(Area newArea);
 };
 
 #endif /* USER_H_ */

@@ -6,12 +6,12 @@ User::User() {
 	this->loggedIn = false;
 }
 
-User::User(stringstream& s) {
+User::User(stringstream& s, vector<Area> areas) {
 	stringstream ss;
 	string newLoginName, newPassword, newInstitution, newAreas;
 
 	if (!getline(s, newLoginName, ';'))
-		cout << "Error" << endl;
+		cout << "Error getting login name" << endl;
 
 	ss << newLoginName;
 	ss >> loginName;
@@ -19,7 +19,7 @@ User::User(stringstream& s) {
 	this->loginName = loginName;
 
 	if (!getline(s, newPassword, ';'))
-		cout << "Error" << endl;
+		cout << "Error getting password" << endl;
 
 	ss << newPassword;
 	ss >> password;
@@ -27,7 +27,7 @@ User::User(stringstream& s) {
 	this->password = password;
 
 	if (!getline(s, newInstitution, ';'))
-		cout << "Error" << endl;
+		cout << "Error getting institution" << endl;
 
 	ss << newInstitution;
 	ss >> institution;
@@ -35,18 +35,24 @@ User::User(stringstream& s) {
 	this->institution = institution;
 
 	if (!getline(s, newAreas, ','))
-		cout << "Error" << endl;
+		cout << "Error getting area" << endl;
 
 	istringstream iss(newAreas);
 	string newArea;
 	while (getline(iss, newArea, ';')) {
-		this->areas.push_back(newArea);
+		this->areasString.push_back(newArea);
 	}
+
+	for (unsigned int i = 0; i < areasString.size(); i++) {
+		Area newArea;
+		newArea = stringToArea(areasString[i], areas);
+		insertArea(newArea);
+	}
+
 	//9999 is just a random big number of months, so it can be bigger than 5 years
 	this->dataPay = 9999;
 	this->loggedIn = false;
 	this->quota = false;
-
 }
 
 string User::getLoginName() {
@@ -79,6 +85,51 @@ bool User::getLoggedIn() {
 	return loggedIn;
 }
 
-vector <string> User::getVectorAreas(){
+vector<string> User::getVectorAreasString() {
+	return areasString;
+}
+
+void User::printAreas() {
+	for (unsigned int i = 0; i < areasString.size(); i++) {
+		cout << areasString[i] << endl;
+	}
+}
+
+Area User::stringToArea(string areaString, vector<Area> areas) {
+
+	vector<string> areaAndSub;
+	string area, subarea;
+	Area newArea;
+	char str[5];
+	strcpy(str, areaString.c_str());
+	char* point;
+	point = strtok(str, "-");
+
+	while (point != NULL) {
+		areaAndSub.push_back(point);
+		point = strtok(NULL, "-");
+	}
+
+	for (unsigned int i = 0; i < areaAndSub.size(); i++) {
+		if (i == 0) {
+			area = areaAndSub[i];
+			subarea = areaAndSub[i + 1];
+		}
+	}
+
+	for (unsigned int i = 0; i < areas.size(); i++) {
+		if (areas[i].getAreaNameSigla() == area
+				&& areas[i].getSubAreaNameSigla() == subarea) {
+			return areas[i];
+		}
+	}
+	return newArea;
+}
+
+vector<Area> User::getVectorAreas() {
 	return areas;
+}
+
+void User::insertArea(Area newArea){
+	this->areas.push_back(newArea);
 }

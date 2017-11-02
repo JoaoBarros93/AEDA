@@ -82,10 +82,11 @@ bool APIC::login(int n, APIC apic) {
 
 bool APIC::regist(APIC apic) {
 	string username, password, institution, areaCompleteString;
+	string date = "01/01/1990";
 	vector<string> areaVector;
 	int pick, pick2;
 	string area, subarea;
-	bool exit=false,exit2=false;
+	bool exit = false, exit2 = false;
 	stringstream ss;
 	stringstream areaComplete;
 
@@ -107,7 +108,7 @@ bool APIC::regist(APIC apic) {
 		}
 	}
 
-	cout << endl <<"Select your password (semicolon or comma will exit): " << endl;
+	cout << endl << "Select your password (semicolon or comma will exit): " << endl;
 	cout << "Password: ";
 	cin >> password;
 	cin.clear();
@@ -126,89 +127,92 @@ bool APIC::regist(APIC apic) {
 		menu1(apic);
 
 	do {
-		do{
+		do {
 
-		cout << endl << "How do you want to visualize the areas of interest?" << endl;
-		cout << "1: The full name" << endl;
-		cout << "2: Just siglas" << endl;
-		cout << "3: I dont want to visualize it" << endl;
-		cout << "Your pick: ";
-		cin >> pick2;
-		cin.clear();
-		cin.ignore(10000, '\n');
-		cout << endl;
-
-		switch (pick2) {
-		case 1:
-			printAreasFull();
-			exit=true;
-			break;
-		case 2:
-			printAreasSiglas();
-			exit=true;
-			break;
-		case 3:
-			exit=true;
-			break;
-		default:
-			cout << "Wrong input!" << endl << endl;
-			break;
-		}
-		}while(exit==false);
-
-		do{
-		cout << endl << "Please choose the area you want to add: " << endl;
-		cout << "Your area: ";
-		cin >> area;
-		cin.clear();
-		cin.ignore(10000, '\n');
-		if (findSemicolon(area))
-				menu1(apic);
-
-
-
-		if (checkArea(area)) {
-			cout << endl << "Now please pick a sub area: " << endl;
-			printSubArea(area);
-			cout << endl;
-			cout << "Your sub area: ";
-			cin >> subarea;
+			cout << endl << "How do you want to visualize the areas of interest?"<< endl;
+			cout << "1: The full name" << endl;
+			cout << "2: Just siglas" << endl;
+			cout << "3: I dont want to visualize it" << endl;
+			cout << "Your pick: ";
+			cin >> pick2;
 			cin.clear();
 			cin.ignore(10000, '\n');
-			if (findSemicolon(subarea))
-					menu1(apic);
-			if (checkSubArea(subarea)) {
-				cout << "Your area was added with sucess! " << endl;
-				exit=true;
-				areaComplete.clear();
-				areaComplete << area << "-" << subarea;
-				areaComplete >> areaCompleteString;
-				areaVector.push_back(areaCompleteString);
-				cout << "Do you want to add another area (1 for yes, anything else for no) ?" << endl;
-				cout << "Your pick: ";
-				cin >> pick;
+			cout << endl;
+
+			switch (pick2) {
+			case 1:
+				printAreasFull();
+				exit = true;
+				break;
+			case 2:
+				printAreasSiglas();
+				exit = true;
+				break;
+			case 3:
+				exit = true;
+				break;
+			default:
+				cout << "Wrong input!" << endl << endl;
+				break;
+			}
+		} while (exit == false);
+
+		do {
+			cout << endl << "Please choose the area you want to add: " << endl;
+			cout << "Your area: ";
+			cin >> area;
+			cin.clear();
+			cin.ignore(10000, '\n');
+			if (findSemicolon(area))
+				menu1(apic);
+			stringToUpper(area);
+
+			if (checkArea(area)) {
+				cout << endl << "Now please pick a sub area: " << endl;
+				printSubArea(area);
+				cout << endl;
+				cout << "Your sub area: ";
+				cin >> subarea;
 				cin.clear();
 				cin.ignore(10000, '\n');
+				if (findSemicolon(subarea))
+					menu1(apic);
+
+				stringToUpper(subarea);
+				if (checkSubArea(subarea)) {
+					cout << "Your area was added with sucess! " << endl;
+					exit = true;
+					areaComplete.clear();
+					areaComplete << area << "-" << subarea;
+					areaComplete >> areaCompleteString;
+					areaVector.push_back(areaCompleteString);
+					cout << "Do you want to add another area (1 for yes, anything else for no) ?" << endl;
+					cout << "Your pick: ";
+					cin >> pick;
+					cin.clear();
+					cin.ignore(10000, '\n');
+				} else {
+					cout << "Could not find your sub area ! " << endl;
+				}
 			} else {
-				cout << "Could not find your sub area ! " << endl;
+				cout << "Could not find your area ! " << endl;
 			}
-		} else {
-			cout << "Could not find your area ! " << endl;
-		}
 
-
-	} while (pick == 1);
-		if(pick!=1)exit2=true;
-	}while(exit2==false);
+		} while (pick == 1);
+		if (pick != 1)
+			exit2 = true;
+	} while (exit2 == false);
 
 	ss << username << ";";
 	ss << password << ";";
 	ss << institution << ";";
+	ss << date << ";";
+
 
 	//file with users names for output
 	ofstream usersFile;
 	usersFile.open("users.txt", ofstream::app);
-	usersFile << username << ";" << password << ";" << institution << ";";
+	usersFile << username << ";" << password << ";" << institution << ";" << date << ";";
 
 	for (unsigned int i = 0; i < areaVector.size(); i++) {
 		if (i + 1 == areaVector.size()) {
@@ -227,6 +231,48 @@ bool APIC::regist(APIC apic) {
 	return true;
 }
 
+//GET FUNCTIONS
+User APIC::getUserLogged() {
+	return userLogged;
+}
+
+bool APIC::getStatus() {
+	return userLoggedStatus;
+}
+
+Date APIC::getTodayDate() {
+	int day = getTodayDay();
+	int month = getTodayMonth();
+	int year = getTodayYear();
+	Date todayDate(day, month, year);
+	return todayDate;
+}
+
+int APIC::getTodayDay() {
+	time_t now;
+	struct tm nowLocal;
+	now = time(NULL);
+	nowLocal = *localtime(&now);
+	return nowLocal.tm_mday;
+}
+
+int APIC::getTodayMonth() {
+	time_t now;
+	struct tm nowLocal;
+	now = time(NULL);
+	nowLocal = *localtime(&now);
+	return nowLocal.tm_mon + 1;
+}
+
+int APIC::getTodayYear() {
+	time_t now;
+	struct tm nowLocal;
+	now = time(NULL);
+	nowLocal = *localtime(&now);
+	return nowLocal.tm_year + 1900;
+}
+
+//SET FUNCTIONS
 void APIC::setUserLogged(User userLogged) {
 	this->userLogged = userLogged;
 }
@@ -239,14 +285,7 @@ void APIC::insertArea(Area newArea) {
 	areas.push_back(newArea);
 }
 
-User APIC::getUserLogged() {
-	return userLogged;
-}
-
-bool APIC::getStatus() {
-	return userLoggedStatus;
-}
-
+//PRINT FUNCTIONS
 void APIC::printUsers() {
 	cout << "All users: " << endl;
 	for (unsigned int i = 0; i < users.size(); i++) {
@@ -260,37 +299,12 @@ void APIC::printUsersComplete() {
 		cout << "----" << "User" << i + 1 << "----" << endl;
 		cout << "Login name: " << users[i].getLoginName() << endl;
 		cout << "Institution: " << users[i].getInstitution() << endl;
-		for (unsigned int j = 0; j < users[i].getVectorAreasString().size();
-				j++) {
-			cout << "Area" << j + 1 << " " << users[i].getVectorAreasString()[j]
-					<< endl;
+		cout << "Date of last quota payment: " << users[i].getDateString() << endl;
+		for (unsigned int j = 0; j < users[i].getVectorAreasString().size();j++) {
+			cout << "Area" << j + 1 << " " << users[i].getVectorAreasString()[j]<< endl;
 		}
 
 		cout << endl;
-	}
-}
-
-void APIC::searchUser() {
-	string user;
-	cout << "Please, insert the login name of the user you are trying to find: "
-			<< endl;
-	cout << "Your pick: ";
-	cin >> user;
-	cin.clear();
-	cin.ignore(10000, '\n');
-
-	for (unsigned int i = 0; i < users.size(); i++) {
-
-		if (users[i].getLoginName() == user) {
-			cout << "User found! " << endl;
-			cout << "Login name: " << users[i].getLoginName() << endl;
-			cout << "Institution: " << users[i].getInstitution() << endl;
-			cout << "Scientific areas of interest: " << endl;
-			for (unsigned int j = 0; j < users[i].getVectorAreas().size();
-					j++) {
-				cout << users[i].getVectorAreasString()[j] << endl;
-			}
-		}
 	}
 }
 
@@ -324,20 +338,42 @@ void APIC::printSubArea(string area) {
 	}
 }
 
-bool APIC::checkArea(string area) {
-	for (unsigned int i = 0; i < areas.size(); i++) {
-		if (area == areas[i].getAreaNameSigla())
-			return true;
-	}
-	return false;
+void APIC::printSubAreasUser() {
+	string area;
+	cout
+			<< "What is the area you want to look for sub areas (type ; for return)?";
+	cout << "Your pick: ";
+	cin >> area;
+	cin.clear();
+	cin.ignore(10000, '\n');
+	if (findSemicolon(area))
+		return;
+	printSubArea(area);
 }
 
-bool APIC::checkSubArea(string subArea) {
-	for (unsigned int i = 0; i < areas.size(); i++) {
-		if (subArea == areas[i].getSubAreaNameSigla())
-			return true;
+//SEARCH FUNCTIONS
+void APIC::searchUser() {
+	string user;
+	cout << "Please, insert the login name of the user you are trying to find: "
+			<< endl;
+	cout << "Your pick: ";
+	cin >> user;
+	cin.clear();
+	cin.ignore(10000, '\n');
+
+	for (unsigned int i = 0; i < users.size(); i++) {
+
+		if (users[i].getLoginName() == user) {
+			cout << "User found! " << endl;
+			cout << "Login name: " << users[i].getLoginName() << endl;
+			cout << "Institution: " << users[i].getInstitution() << endl;
+			cout << "Scientific areas of interest: " << endl;
+			for (unsigned int j = 0; j < users[i].getVectorAreas().size();
+					j++) {
+				cout << users[i].getVectorAreasString()[j] << endl;
+			}
+		}
 	}
-	return false;
 }
 
 void APIC::searchUserByArea() {
@@ -405,6 +441,25 @@ void APIC::searchUserBySubArea() {
 	}
 }
 
+
+
+//CHECK FUNCTIONS
+bool APIC::checkArea(string area) {
+	for (unsigned int i = 0; i < areas.size(); i++) {
+		if (area == areas[i].getAreaNameSigla())
+			return true;
+	}
+	return false;
+}
+
+bool APIC::checkSubArea(string subArea) {
+	for (unsigned int i = 0; i < areas.size(); i++) {
+		if (subArea == areas[i].getSubAreaNameSigla())
+			return true;
+	}
+	return false;
+}
+
 bool APIC::findSemicolon(string stringToSearch) {
 	basic_string<char>::size_type index1, index2, index3;
 	static const basic_string<char>::size_type npos = -1;
@@ -413,25 +468,29 @@ bool APIC::findSemicolon(string stringToSearch) {
 	index3 = stringToSearch.find(' ');
 
 	if (index1 != npos || index2 != npos || index3 != npos) {
-		cout << "You returned back! " << endl <<endl;
+		cout << "You returned back! " << endl << endl;
 		return true;
 	} else
 		return false;
 }
 
-void APIC::printSubAreasUser() {
-	string area;
-	cout
-			<< "What is the area you want to look for sub areas (type ; for return)?";
-	cout << "Your pick: ";
-	cin >> area;
-	cin.clear();
-	cin.ignore(10000, '\n');
-	if (findSemicolon(area))
-		return;
-	printSubArea(area);
+//OTHER FUNCTIONS
+void APIC::payQuota() {
+	Date todayDate = getTodayDate();
+	todayDate.printDate();
+	userLogged.setDatePay(todayDate);
+	cout << "Thank you!" << endl;
+	cout << "Your quota has been paid. You have now full access! " << endl;
 }
 
+void APIC::stringToUpper(string &s){
+   for(unsigned int l = 0; l < s.length(); l++)
+  {
+    s[l] = toupper(s[l]);
+  }
+}
+
+//MENUS
 void APIC::menu1(APIC apic) {
 
 	int pick;
@@ -533,6 +592,10 @@ void APIC::menu2(APIC apic) {
 		case 8: {
 			cout << endl;
 			printSubAreasUser();
+			break;
+		}
+		case 12: {
+			payQuota();
 			break;
 		}
 		case 13: {

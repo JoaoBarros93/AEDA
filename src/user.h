@@ -9,6 +9,7 @@
 #include <cstring>
 #include <sstream>
 #include "area.h"
+#include "date.h"
 
 using namespace std;
 
@@ -17,9 +18,9 @@ private:
 	string loginName;
 	string password;
 	string institution;
+	string dateString;
 	bool loggedIn;
-	bool quota;
-	int dataPay;
+	Date datePay;
 	vector <string> areasString;
 	vector <Area> areas;
 public:
@@ -29,13 +30,19 @@ public:
 	string getPassword();
 	string getInstitution();
 	bool getLoggedIn();
+	Date getDatePay();
+	string getDateString();
 	vector <Area> getVectorAreas();
 	vector <string> getVectorAreasString();
+	void insertArea(Area newArea);
+	void setDatePay(Date date);
 	void login();
 	void logout();
 	void printAreas();
 	Area stringToArea(string areaString, vector<Area > areas);
-	void insertArea(Area newArea);
+	Date stringToDate(string dateString);
+	int stringToMonth(string dateString);
+	int stringToYear(string dateString);
 };
 
 #endif /* USER_H_ */

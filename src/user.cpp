@@ -58,6 +58,12 @@ User::User(stringstream& s, vector<Area> areas) {
 		insertArea(newArea);
 	}
 
+	Date todayDate = getTodayDate();
+
+	if(this->datePay.isContributor(todayDate))this->status='c';
+	else if(this->datePay.isSub(todayDate))this->status='s';
+	else this->status='i';
+
 	//starts logged off
 	this->loggedIn = false;
 }
@@ -93,6 +99,42 @@ vector<Area> User::getVectorAreas() {
 
 string User::getDateString(){
 	return dateString;
+}
+
+char User::getStatus(){
+	return status;
+}
+
+Date User::getTodayDate() {
+int day = getTodayDay();
+int month = getTodayMonth();
+int year = getTodayYear();
+Date todayDate(day, month, year);
+return todayDate;
+}
+
+int User::getTodayDay() {
+time_t now;
+struct tm nowLocal;
+now = time(NULL);
+nowLocal = *localtime(&now);
+return nowLocal.tm_mday;
+}
+
+int User::getTodayMonth() {
+time_t now;
+struct tm nowLocal;
+now = time(NULL);
+nowLocal = *localtime(&now);
+return nowLocal.tm_mon + 1;
+}
+
+int User::getTodayYear() {
+time_t now;
+struct tm nowLocal;
+now = time(NULL);
+nowLocal = *localtime(&now);
+return nowLocal.tm_year + 1900;
 }
 
 //SET FUNCTIONS

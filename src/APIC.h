@@ -47,7 +47,7 @@ public:
 	bool checkArea(string area);
 	bool checkSubArea(string subArea);
 	bool findSemicolon(string stringToSearch);
-	void payQuota();
+	void payQuota(APIC apic);
 	void stringToUpper(string &s);
 	void menu1(APIC apic);
 	void menu2(APIC apic);

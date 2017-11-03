@@ -84,26 +84,29 @@ void Date::printDate() {
 	cout << getDay() << "/" << getMonth() << "/" << getYear() << endl;
 }
 
-bool Date::isLongerThan5Months(Date dateToCompare) {
-	float numDays = 0;
+bool Date::isSub(Date dateToCompare) {
 	int day2 = dateToCompare.getDay();
 	int month2 = dateToCompare.getMonth();
 	int year2 = dateToCompare.getYear();
 
-	if (year2 == this->year) {
-		if (this->month + 5 > month2) return false;
+	if (this->year + 5 > year2)
+		return true;
+	else if (this->year + 5 == year2) {
+		if (this->month > month2)
+			return true;
 		else if (this->month == month2) {
-			if (this->day > day2) return true;
-			 else return false;
+			if (this->day >= day2)
+				return true;
+			else
+				return false;
 		}
 	}
-	if (this->year < year2) {
-		if (year2 - this->year > 1) return true;
-		if (year2 - this->year == 1) {
-			numDays = (GiveMonthDays(month, year) - day) + ((12 - month) * 30.5)+ (day2) + (month2 * 30.5);
-			if (numDays > 153) return true;
-			 else return false;
-		}
-	}
-	return true;
+
+	return false;
+}
+
+bool Date::isContributor(Date dateToCompare) {
+	int year2 = dateToCompare.getYear();
+	if(this->year+1>=year2)return true;
+	return false;
 }

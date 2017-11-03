@@ -10,8 +10,8 @@
 #include <cctype>
 #include <algorithm>
 #include <ctime>
-#include "User.h"
-#include "Area.h"
+#include "user.h"
+#include "area.h"
 #include "date.h"
 
 using namespace std;

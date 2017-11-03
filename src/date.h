@@ -27,6 +27,7 @@ public:
 	void setDate(unsigned int day, unsigned int month, unsigned int year);
 	unsigned int GiveMonthDays(unsigned int month, unsigned int year);
 	bool isBissesto(unsigned int ano);
+	bool isLongerThan5Months(Date dateToCompare);
 	void printDate();
 
 };

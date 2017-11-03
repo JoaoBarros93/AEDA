@@ -15,16 +15,15 @@ Date::Date(string dateString) {
 	vector<string> tokens;
 	regex re("\\d+");
 
-
 	sregex_token_iterator begin(dateString.begin(), dateString.end(), re), end;
 
 	copy(begin, end, back_inserter(tokens));
 
-	for(unsigned int i = 0;i<tokens.size();i++){
-		if(i==0){
-			this->day=stoi(tokens[i]);
-			this->month=stoi(tokens[i+1]);
-			this->year=stoi(tokens[i+2]);
+	for (unsigned int i = 0; i < tokens.size(); i++) {
+		if (i == 0) {
+			this->day = stoi(tokens[i]);
+			this->month = stoi(tokens[i + 1]);
+			this->year = stoi(tokens[i + 2]);
 		}
 	}
 }
@@ -83,4 +82,28 @@ unsigned int Date::GiveMonthDays(unsigned int month, unsigned int year) {
 
 void Date::printDate() {
 	cout << getDay() << "/" << getMonth() << "/" << getYear() << endl;
+}
+
+bool Date::isLongerThan5Months(Date dateToCompare) {
+	float numDays = 0;
+	int day2 = dateToCompare.getDay();
+	int month2 = dateToCompare.getMonth();
+	int year2 = dateToCompare.getYear();
+
+	if (year2 == this->year) {
+		if (this->month + 5 > month2) return false;
+		else if (this->month == month2) {
+			if (this->day > day2) return true;
+			 else return false;
+		}
+	}
+	if (this->year < year2) {
+		if (year2 - this->year > 1) return true;
+		if (year2 - this->year == 1) {
+			numDays = (GiveMonthDays(month, year) - day) + ((12 - month) * 30.5)+ (day2) + (month2 * 30.5);
+			if (numDays > 153) return true;
+			 else return false;
+		}
+	}
+	return true;
 }

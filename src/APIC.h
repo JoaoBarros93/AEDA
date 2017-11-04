@@ -13,6 +13,7 @@
 #include "user.h"
 #include "area.h"
 #include "date.h"
+#include "event.h"
 
 using namespace std;
 
@@ -48,6 +49,9 @@ public:
 	bool checkSubArea(string subArea);
 	bool findSemicolon(string stringToSearch);
 	void payQuota(APIC apic);
+	void createEvent(APIC apic);
+	void createSummerSchool(APIC apic);
+	void createConference(APIC apic);
 	void stringToUpper(string &s);
 	void menu1(APIC apic);
 	void menu2(APIC apic);

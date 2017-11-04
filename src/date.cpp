@@ -14,6 +14,7 @@ Date::Date(string dateString) {
 
 	vector<string> tokens;
 	regex re("\\d+");
+	stringstream day, month, year;
 
 	sregex_token_iterator begin(dateString.begin(), dateString.end(), re), end;
 
@@ -21,6 +22,18 @@ Date::Date(string dateString) {
 
 	for (unsigned int i = 0; i < tokens.size(); i++) {
 		if (i == 0) {
+			if (stoi(tokens[i]) < 1 || stoi(tokens[i]) > 31) {
+				cout << "ERROR! Wrong date format! " << endl;
+				return;
+			}
+			if (stoi(tokens[i + 1]) < 1 || stoi(tokens[i + 1]) > 12) {
+				cout << "ERROR! Wrong date format! " << endl;
+				return;
+			}
+			if (stoi(tokens[i + 2]) < 1900 || stoi(tokens[i + 2]) > 2099) {
+				cout << "ERROR! Wrong date format! " << endl;
+				return;
+			}
 			this->day = stoi(tokens[i]);
 			this->month = stoi(tokens[i + 1]);
 			this->year = stoi(tokens[i + 2]);
@@ -40,6 +53,38 @@ int Date::getYear() {
 	return year;
 }
 
+Date Date::getTodayDate() {
+	int day = getTodayDay();
+	int month = getTodayMonth();
+	int year = getTodayYear();
+	Date todayDate(day, month, year);
+	return todayDate;
+}
+
+int Date::getTodayDay() {
+	time_t now;
+	struct tm nowLocal;
+	now = time(NULL);
+	nowLocal = *localtime(&now);
+	return nowLocal.tm_mday;
+}
+
+int Date::getTodayMonth() {
+	time_t now;
+	struct tm nowLocal;
+	now = time(NULL);
+	nowLocal = *localtime(&now);
+	return nowLocal.tm_mon + 1;
+}
+
+int Date::getTodayYear() {
+	time_t now;
+	struct tm nowLocal;
+	now = time(NULL);
+	nowLocal = *localtime(&now);
+	return nowLocal.tm_year + 1900;
+}
+
 void Date::setDate(unsigned int day, unsigned int month, unsigned int year) {
 	if (month < 1 || month > 12)
 		cout << "ERROR: Wrong month! ";
@@ -56,6 +101,24 @@ void Date::setDate(unsigned int day, unsigned int month, unsigned int year) {
 
 bool Date::isBissesto(unsigned int ano) {
 	return (ano % 4 == 0 && ((ano % 100 != 0) || (ano % 400 == 0)));
+}
+
+bool Date::isFuture() {
+	Date todayDate = getTodayDate();
+
+	if (this->year < todayDate.getYear())
+		return false;
+
+	else if (this->year == todayDate.getYear()) {
+		if (this->month < todayDate.getMonth())
+			return false;
+
+		else if (this->month == todayDate.getMonth()) {
+			if (this->day < todayDate.getDay())
+				return false;
+		}
+	}
+	return true;
 }
 
 unsigned int Date::GiveMonthDays(unsigned int month, unsigned int year) {
@@ -107,6 +170,11 @@ bool Date::isSub(Date dateToCompare) {
 
 bool Date::isContributor(Date dateToCompare) {
 	int year2 = dateToCompare.getYear();
-	if(this->year+1>=year2)return true;
+	if (this->year + 1 >= year2)
+		return true;
 	return false;
+}
+
+inline bool Date::isNumber(const int & c) {
+	return (c >= 48 && c <= 57);
 }

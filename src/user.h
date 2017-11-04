@@ -47,9 +47,6 @@ public:
 	void logout();
 	void printAreas();
 	Area stringToArea(string areaString, vector<Area > areas);
-	Date stringToDate(string dateString);
-	int stringToMonth(string dateString);
-	int stringToYear(string dateString);
 };
 
 #endif /* USER_H_ */

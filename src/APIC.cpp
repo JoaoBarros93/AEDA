@@ -185,7 +185,7 @@ bool APIC::regist(APIC apic) {
 
 				stringToUpper(subarea);
 				if (checkSubArea(subarea)) {
-					cout << "Your area was added with sucess! " << endl;
+					cout << "Your area was added with success! " << endl;
 					exit = true;
 					areaComplete.clear();
 					areaComplete << area << "-" << subarea;
@@ -487,8 +487,8 @@ bool APIC::findSemicolon(string stringToSearch) {
 //OTHER FUNCTIONS
 void APIC::payQuota(APIC apic) {
 	Date todayDate = getTodayDate();
-	for(unsigned int i = 0 ;i<users.size();i++){
-		if(users[i].getLoginName()==apic.getUserLogged().getLoginName()){
+	for (unsigned int i = 0; i < users.size(); i++) {
+		if (users[i].getLoginName() == apic.getUserLogged().getLoginName()) {
 			users[i].setDatePay(todayDate);
 		}
 	}
@@ -504,11 +504,18 @@ void APIC::payQuota(APIC apic) {
 				<< users[i].getDatePay().getMonth() << "/"
 				<< users[i].getDatePay().getYear() << ";";
 
-		for (unsigned int j = 0; j < users[i].getVectorAreasString().size();j++) {
+		for (unsigned int j = 0; j < users[i].getVectorAreasString().size();
+				j++) {
 			if (j + 1 == users[i].getVectorAreasString().size()) {
-				usersFile << users[i].getVectorAreas()[j].getAreaNameSigla() << "-" << users[i].getVectorAreas()[j].getSubAreaNameSigla() << "," << endl;
+				usersFile << users[i].getVectorAreas()[j].getAreaNameSigla()
+						<< "-"
+						<< users[i].getVectorAreas()[j].getSubAreaNameSigla()
+						<< "," << endl;
 			} else {
-				usersFile << users[i].getVectorAreas()[j].getAreaNameSigla() << "-"<< users[i].getVectorAreas()[j].getSubAreaNameSigla() << ";";
+				usersFile << users[i].getVectorAreas()[j].getAreaNameSigla()
+						<< "-"
+						<< users[i].getVectorAreas()[j].getSubAreaNameSigla()
+						<< ";";
 			}
 		}
 	}
@@ -521,6 +528,189 @@ void APIC::stringToUpper(string &s) {
 	for (unsigned int l = 0; l < s.length(); l++) {
 		s[l] = toupper(s[l]);
 	}
+}
+
+void APIC::createEvent(APIC apic) {
+	int pick;
+	do {
+		cout << "What type of event do you want to create? " << endl;
+		cout << "1: Conference" << endl;
+		cout << "2: Summer School" << endl;
+		cout << "0: Exit" << endl;
+		cout << "Your pick: ";
+		cin >> pick;
+		cin.clear();
+		cin.ignore(10000, '\n');
+
+		switch (pick) {
+		case 1:
+			createConference(apic);
+			break;
+		case 2:
+			createSummerSchool(apic);
+			break;
+
+		case 0:
+			return;
+			break;
+		default:
+			cout << "Wrong pick! Please pick again" << endl;
+			break;
+		}
+	} while (pick <= 0 || pick > 2);
+}
+
+void APIC::createSummerSchool(APIC apic) {
+	int pick, ok = 1, error = 0;
+	string local, dateString, newFormer, title;
+	vector<User> formers;
+
+	cout << "Where will the event take place? (semicolon will return back. Please do not use spaces) " << endl;
+	cin >> local;
+	cin.clear();
+	cin.ignore(10000, '\n');
+	//try to find ";" in local
+	if (findSemicolon(local))
+		return;
+
+	do {
+		cout << "In which date will the event take place? (format: 'dd/mm/yyyy' Semicolon will return back) " << endl;
+		cin >> dateString;
+		cin.clear();
+		cin.ignore(10000, '\n');
+		//try to find ";" in dateString
+		if (findSemicolon(dateString))
+			return;
+
+		Date date(dateString);
+		if (!date.isFuture()) {
+			cout << "ERROR! You need to enter a future date!" << endl;
+			error = 1;
+		}
+		else error = 0;
+	} while (error == 1);
+
+	Date date(dateString);
+
+	cout << "Please insert a title for the event: (Semicolon will return back. Please do not use spaces) " << endl;
+	cin >> title;
+	cin.clear();
+	cin.ignore(10000, '\n');
+	//try to find ";" in title
+	if (findSemicolon(title))
+		return;
+
+	cout << endl;
+	printUsers();
+	cout << endl;
+	do {
+		ok = 1;
+		cout
+				<< "Insert the name of the user you want to add as former: (Semicolon will return back) "
+				<< endl;
+		cin >> newFormer;
+		cin.clear();
+		cin.ignore(10000, '\n');
+		//try to find ";" in newFormer
+		if (findSemicolon(newFormer))
+			return;
+		for (unsigned int i = 0; i < users.size(); i++) {
+			if (users[i].getLoginName() == newFormer) {
+				formers.push_back(users[i]);
+				ok = 0;
+			}
+		}
+		if (ok == 1)
+			cout << "Sorry. Could not find your user. " << endl;
+		cout << "Do you want to add more formers? (1 for yes or 2 for no)"
+				<< endl;
+		cin >> pick;
+		cin.clear();
+		cin.ignore(10000, '\n');
+	} while (pick == 1);
+	if (ok == 0)
+		cout << "Success! Event created! " << endl;
+
+	EventSummerSchool newSummerSchool(formers, apic.getUserLogged(), local,
+			date, 's', title);
+
+	ofstream eventsFile;
+	eventsFile.open("events.txt", ofstream::app);
+	eventsFile << apic.getUserLogged().getLoginName() << ";" << local << ";"
+			<< title << ";" << date.getDay() << "/" << date.getMonth() << "/"
+			<< date.getYear() << ";s;";
+
+	for (unsigned int i = 0; i < formers.size(); i++) {
+		if (i + 1 == formers.size()) {
+			eventsFile << formers[i].getLoginName() << ";" << endl;
+		} else {
+			eventsFile << formers[i].getLoginName() << ",";
+		}
+	}
+
+	eventsFile.close();
+
+}
+
+void APIC::createConference(APIC apic) {
+	unsigned int numberPeople, error = 0;
+	string local, dateString, newFormer, title;
+
+	cout << "Where will the event take place? (Semicolon will return back)"
+			<< endl;
+	cin >> local;
+	cin.clear();
+	cin.ignore(10000, '\n');
+	//try to find ";" in local
+	if (findSemicolon(local))
+		return;
+
+	do {
+		cout << "In which date will the event take place? (format: 'dd/mm/yyyy' Semicolon will return back) " << endl;
+		cin >> dateString;
+		cin.clear();
+		cin.ignore(10000, '\n');
+		//try to find ";" in dateString
+		if (findSemicolon(dateString))
+			return;
+
+		Date date(dateString);
+		if (!date.isFuture()) {
+			cout << "ERROR! You need to enter a future date!" << endl;
+			error = 1;
+		}
+		else error = 0;
+	} while (error == 1);
+
+	Date date(dateString);
+
+	cout << "Please insert a title for the event: (Semicolon will return back. Please dont use spaces) " << endl;
+	cin >> title;
+	cin.clear();
+	cin.ignore(10000, '\n');
+	//try to find ";" in title
+	if (findSemicolon(title))
+		return;
+
+	cout << "Please insert the number of people you think that will show for this event: " << endl;
+	cin >> numberPeople;
+	cin.clear();
+	cin.ignore(10000, '\n');
+
+	cout << "Success! Event created! " << endl;
+	cout << "You can now message other users to promote your event!" << endl;
+
+	EventConference newConference(numberPeople, apic.getUserLogged(), local,
+			date, 'c', title);
+
+	ofstream eventsFile;
+	eventsFile.open("events.txt", ofstream::app);
+	eventsFile << apic.getUserLogged().getLoginName() << ";" << local << ";"
+			<< title << ";" << date.getDay() << "/" << date.getMonth() << "/"
+			<< date.getYear() << ";c;" << numberPeople << endl;
+
+	eventsFile.close();
+
 }
 
 //MENUS
@@ -574,7 +764,8 @@ void APIC::menu2(APIC apic) {
 		cout << "3: Search for an user by its name" << endl;
 		cout << "4: Search for all users in an area" << endl;
 		cout << "5: Search for all users in an subarea" << endl;
-		cout << "6: Print all areas of interest with complete information " << endl;
+		cout << "6: Print all areas of interest with complete information "
+				<< endl;
 		cout << "7: Print all areas of interest, but just siglas " << endl;
 		cout << "8: Look for the subareas of an area" << endl;
 		cout << "9: Search for an event " << endl;
@@ -624,6 +815,15 @@ void APIC::menu2(APIC apic) {
 		case 8: {
 			cout << endl;
 			printSubAreasUser();
+			break;
+		}
+		case 10: {
+			cout << endl;
+			createEvent(apic);
+			break;
+		}
+		case 11: {
+			cout << endl;
 			break;
 		}
 		case 12: {

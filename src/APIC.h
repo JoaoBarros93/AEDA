@@ -22,6 +22,7 @@ private:
 	User userLogged;
 	vector<User > users;
 	vector<Area > areas;
+	vector<Event > events;
 	bool userLoggedStatus = userLogged.getLoggedIn();
 public:
 	APIC();
@@ -36,7 +37,9 @@ public:
 	void setUserLogged(User userLogged);
 	void insertUser(User newuser);
 	void insertArea(Area newArea);
+	void insertEvent(Event event);
 	void searchUser();
+	void searchEvent();
 	void searchUserByArea();
 	void searchUserBySubArea();
 	void printUsers();
@@ -53,9 +56,14 @@ public:
 	void createSummerSchool(APIC apic);
 	void createConference(APIC apic);
 	void stringToUpper(string &s);
+	void promoteEvent();
+	void loadUsers();
+	void loadAreas();
+	void loadEvents();
 	void menu1(APIC apic);
 	void menu2(APIC apic);
+	void menuSearch(APIC apic);
+	void menuEvents(APIC apic);
 };
-
 
 #endif /* APIC_H_ */

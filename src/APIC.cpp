@@ -4,34 +4,14 @@ using namespace std;
 APIC::APIC() {
 
 	//read areas file and populate areas vector
-	fstream areasFile("areas.txt");
-	string line2;
-	stringstream ss2;
+	loadAreas();
 
-	while (areasFile.good()) {
-		ss2.clear();
-		getline(areasFile, line2, '\n');
-		if (line2 != "") {
-			ss2 << line2;
-			Area newArea(ss2);
-			insertArea(newArea);
-		}
-	}
+	//read users file and populate users vector
+	loadUsers();
 
-	//read users file and populate
-	fstream usersFile("users.txt");
-	string line;
-	stringstream ss;
+	//read events file and populate events vector
+	//loadEvents();
 
-	while (usersFile.good()) {
-		ss.clear();
-		getline(usersFile, line, '\n');
-		if (line != "") {
-			ss << line;
-			User newUser(ss, areas);
-			insertUser(newUser);
-		}
-	}
 }
 
 bool APIC::login(int n, APIC apic) {
@@ -136,10 +116,12 @@ bool APIC::regist(APIC apic) {
 					<< "How do you want to visualize the areas of interest?"
 					<< endl;
 			cout << "1: The full name" << endl;
-			cout << "2: Just siglas" << endl;
-			cout << "3: I dont want to visualize it" << endl;
+			cout << "2: Just acronyms" << endl;
+			cout << "3: I do not want to visualize it" << endl;
 			cout << "Your pick: ";
 			cin >> pick2;
+			if (cin.fail())
+				cout << "ERROR! Wrong input! " << endl;
 			cin.clear();
 			cin.ignore(10000, '\n');
 			cout << endl;
@@ -240,6 +222,62 @@ bool APIC::regist(APIC apic) {
 	return true;
 }
 
+//LOAD FUNCTIONS
+void APIC::loadUsers() {
+	fstream usersFile("users.txt");
+	string line;
+	stringstream ss;
+
+	while (usersFile.good()) {
+		ss.clear();
+		getline(usersFile, line, '\n');
+		if (line != "") {
+			ss << line;
+			User newUser(ss, areas);
+			insertUser(newUser);
+		}
+	}
+}
+void APIC::loadAreas() {
+	fstream areasFile("areas.txt");
+	string line2;
+	stringstream ss2;
+
+	while (areasFile.good()) {
+		ss2.clear();
+		getline(areasFile, line2, '\n');
+		if (line2 != "") {
+			ss2 << line2;
+			Area newArea(ss2);
+			insertArea(newArea);
+		}
+	}
+}
+
+/*void APIC::loadEvents() {
+	fstream eventsFile("events.txt");
+	string type, line2;
+	stringstream ss, ss2;
+
+	while (eventsFile.good()) {
+		ss2.clear();
+		getline(eventsFile, line2, '\n');
+		if (line2 != "") {
+			ss2 << line2;
+			if (!getline(ss2, type, ';'))
+				cout << "Error getting type from event" << endl;
+			if (type == "c")
+				EventConference newConference(ss2);
+
+			else if (type == "s")
+				EventSummerSchool newSummerSchool(ss2);
+
+			else
+				cout << "ERROR! Error reading events!" << endl;
+		}
+	}
+}*/
+
 //GET FUNCTIONS
 User APIC::getUserLogged() {
 	return userLogged;
@@ -292,6 +330,10 @@ void APIC::insertUser(User newuser) {
 
 void APIC::insertArea(Area newArea) {
 	areas.push_back(newArea);
+}
+
+void APIC::insertEvent(Event newEvent) {
+	events.push_back(newEvent);
 }
 
 //PRINT FUNCTIONS
@@ -352,15 +394,22 @@ void APIC::printSubArea(string area) {
 
 void APIC::printSubAreasUser() {
 	string area;
-	cout
-			<< "What is the area you want to look for sub areas (type ; for return)?";
-	cout << "Your pick: ";
-	cin >> area;
-	cin.clear();
-	cin.ignore(10000, '\n');
-	if (findSemicolon(area))
-		return;
-	printSubArea(area);
+	do {
+		cout << endl << "For which area are you looking for sub areas?" << endl;
+		cout << "Type ';' or ',' will return back. " << endl;
+		cout << "Type 'area?' will show you all the areas available" << endl;
+		cout << "Your pick: ";
+		cin >> area;
+		if (area == "area?")
+			printAreasFull();
+
+		cin.clear();
+		cin.ignore(10000, '\n');
+		if (findSemicolon(area))
+			return;
+		printSubArea(area);
+	} while (true);
+
 }
 
 //SEARCH FUNCTIONS
@@ -386,6 +435,9 @@ void APIC::searchUser() {
 			}
 		}
 	}
+}
+
+void APIC::searchEvent() {
 }
 
 void APIC::searchUserByArea() {
@@ -530,10 +582,14 @@ void APIC::stringToUpper(string &s) {
 	}
 }
 
+void APIC::promoteEvent() {
+
+}
+
 void APIC::createEvent(APIC apic) {
 	int pick;
 	do {
-		cout << "What type of event do you want to create? " << endl;
+		cout << endl <<  "What type of event do you want to create? " << endl;
 		cout << "1: Conference" << endl;
 		cout << "2: Summer School" << endl;
 		cout << "0: Exit" << endl;
@@ -549,7 +605,6 @@ void APIC::createEvent(APIC apic) {
 		case 2:
 			createSummerSchool(apic);
 			break;
-
 		case 0:
 			return;
 			break;
@@ -565,7 +620,9 @@ void APIC::createSummerSchool(APIC apic) {
 	string local, dateString, newFormer, title;
 	vector<User> formers;
 
-	cout << "Where will the event take place? (semicolon will return back. Please do not use spaces) " << endl;
+	cout
+			<< "Where will the event take place? (semicolon will return back. Please do not use spaces) "
+			<< endl;
 	cin >> local;
 	cin.clear();
 	cin.ignore(10000, '\n');
@@ -574,7 +631,9 @@ void APIC::createSummerSchool(APIC apic) {
 		return;
 
 	do {
-		cout << "In which date will the event take place? (format: 'dd/mm/yyyy' Semicolon will return back) " << endl;
+		cout
+				<< "In which date will the event take place? (format: 'dd/mm/yyyy' Semicolon will return back) "
+				<< endl;
 		cin >> dateString;
 		cin.clear();
 		cin.ignore(10000, '\n');
@@ -586,13 +645,15 @@ void APIC::createSummerSchool(APIC apic) {
 		if (!date.isFuture()) {
 			cout << "ERROR! You need to enter a future date!" << endl;
 			error = 1;
-		}
-		else error = 0;
+		} else
+			error = 0;
 	} while (error == 1);
 
 	Date date(dateString);
 
-	cout << "Please insert a title for the event: (Semicolon will return back. Please do not use spaces) " << endl;
+	cout
+			<< "Please insert a title for the event: (Semicolon will return back. Please do not use spaces) "
+			<< endl;
 	cin >> title;
 	cin.clear();
 	cin.ignore(10000, '\n');
@@ -625,20 +686,21 @@ void APIC::createSummerSchool(APIC apic) {
 		cout << "Do you want to add more formers? (1 for yes or 2 for no)"
 				<< endl;
 		cin >> pick;
+		if (cin.fail())
+			cout << "ERROR! Wrong input! " << endl;
 		cin.clear();
 		cin.ignore(10000, '\n');
 	} while (pick == 1);
 	if (ok == 0)
 		cout << "Success! Event created! " << endl;
 
-	EventSummerSchool newSummerSchool(formers, apic.getUserLogged(), local,
-			date, 's', title);
+	EventSummerSchool newSummerSchool(formers, apic.getUserLogged(),local, date, 's', title);
 
 	ofstream eventsFile;
 	eventsFile.open("events.txt", ofstream::app);
-	eventsFile << apic.getUserLogged().getLoginName() << ";" << local << ";"
-			<< title << ";" << date.getDay() << "/" << date.getMonth() << "/"
-			<< date.getYear() << ";s;";
+	eventsFile << "s;" << apic.getUserLogged().getLoginName() << ";" << local
+			<< ";" << title << ";" << date.getDay() << "/" << date.getMonth()
+			<< "/" << date.getYear() << ";";
 
 	for (unsigned int i = 0; i < formers.size(); i++) {
 		if (i + 1 == formers.size()) {
@@ -666,7 +728,9 @@ void APIC::createConference(APIC apic) {
 		return;
 
 	do {
-		cout << "In which date will the event take place? (format: 'dd/mm/yyyy' Semicolon will return back) " << endl;
+		cout
+				<< "In which date will the event take place? (format: 'dd/mm/yyyy' Semicolon will return back) "
+				<< endl;
 		cin >> dateString;
 		cin.clear();
 		cin.ignore(10000, '\n');
@@ -678,13 +742,15 @@ void APIC::createConference(APIC apic) {
 		if (!date.isFuture()) {
 			cout << "ERROR! You need to enter a future date!" << endl;
 			error = 1;
-		}
-		else error = 0;
+		} else
+			error = 0;
 	} while (error == 1);
 
 	Date date(dateString);
 
-	cout << "Please insert a title for the event: (Semicolon will return back. Please dont use spaces) " << endl;
+	cout
+			<< "Please insert a title for the event: (Semicolon will return back. Please dont use spaces) "
+			<< endl;
 	cin >> title;
 	cin.clear();
 	cin.ignore(10000, '\n');
@@ -692,22 +758,25 @@ void APIC::createConference(APIC apic) {
 	if (findSemicolon(title))
 		return;
 
-	cout << "Please insert the number of people you think that will show for this event: " << endl;
+	cout
+			<< "Please insert the number of people you think that will show for this event: "
+			<< endl;
 	cin >> numberPeople;
+	if (cin.fail())
+		cout << "ERROR! Wrong input! " << endl;
 	cin.clear();
 	cin.ignore(10000, '\n');
 
 	cout << "Success! Event created! " << endl;
 	cout << "You can now message other users to promote your event!" << endl;
 
-	EventConference newConference(numberPeople, apic.getUserLogged(), local,
-			date, 'c', title);
+	EventConference newConference(numberPeople, apic.getUserLogged(),local, date, 'c', title);
 
 	ofstream eventsFile;
 	eventsFile.open("events.txt", ofstream::app);
-	eventsFile << apic.getUserLogged().getLoginName() << ";" << local << ";"
-			<< title << ";" << date.getDay() << "/" << date.getMonth() << "/"
-			<< date.getYear() << ";c;" << numberPeople << endl;
+	eventsFile << "c;" << apic.getUserLogged().getLoginName() << ";" << local
+			<< ";" << title << ";" << date.getDay() << "/" << date.getMonth()
+			<< "/" << date.getYear() << ";" << numberPeople << endl;
 
 	eventsFile.close();
 
@@ -725,6 +794,8 @@ void APIC::menu1(APIC apic) {
 		cout << "0: To exit" << endl;
 		cout << "Your pick: ";
 		cin >> pick;
+		if (cin.fail())
+			cout << "ERROR! Wrong input! " << endl;
 		cin.clear();
 		cin.ignore(10000, '\n');
 
@@ -759,23 +830,74 @@ void APIC::menu2(APIC apic) {
 		cout << endl << "Welcome " << apic.getUserLogged().getLoginName()
 				<< endl;
 		cout << "Please choose what you want to do next: " << endl;
+		cout << "1: Go to search and print menu" << endl;
+		cout << "2: Go to the message menu" << endl;
+		cout << "3: Go to events menu" << endl;
+		cout << "4: Pay my quota " << endl;
+		cout << "5: To Log Out" << endl;
+		cout << "0: To exit" << endl;
+		cout << "Your pick: ";
+		cin >> pick;
+		if (cin.fail())
+			cout << "ERROR! Wrong input! " << endl;
+		cin.clear();
+		cin.ignore(10000, '\n');
+
+		switch (pick) {
+		case 1: {
+			menuSearch(apic);
+			break;
+		}
+		case 2: {
+			break;
+		}
+		case 3: {
+			menuEvents(apic);
+			break;
+		}
+
+		case 4: {
+			payQuota(apic);
+			break;
+		}
+		case 5: {
+			cout << endl;
+			apic.getUserLogged().logout();
+			menu1(apic);
+			break;
+		}
+		case 0: {
+			cout << "See you soon!" << endl;
+			exit(EXIT_FAILURE);
+			break;
+		}
+		}
+	} while (true);
+}
+
+void APIC::menuSearch(APIC apic) {
+	int pick;
+
+	do {
+		cout << endl << "----Search and Print Menu----" << endl;
+		cout << "Please choose what you want to do next: " << endl;
 		cout << "1: See all other users names" << endl;
 		cout << "2: See every information of all users" << endl;
 		cout << "3: Search for an user by its name" << endl;
 		cout << "4: Search for all users in an area" << endl;
 		cout << "5: Search for all users in an subarea" << endl;
-		cout << "6: Print all areas of interest with complete information "
+		cout << "6: Search for an event" << endl;
+		cout << "7: Print all areas of interest with complete information "
 				<< endl;
-		cout << "7: Print all areas of interest, but just siglas " << endl;
-		cout << "8: Look for the subareas of an area" << endl;
-		cout << "9: Search for an event " << endl;
-		cout << "10: Create an event " << endl;
-		cout << "11: Promote an event " << endl;
-		cout << "12: Pay my quota " << endl;
-		cout << "13: To Log Out" << endl;
+		cout << "8: Print all areas of interest, but just siglas " << endl;
+		cout << "9: Look for the subareas of an area" << endl;
+		cout << "10: Go to previous menu" << endl;
+		cout << "11: To Log Out" << endl;
 		cout << "0: To exit" << endl;
 		cout << "Your pick: ";
 		cin >> pick;
+		if (cin.fail())
+			cout << "ERROR! Wrong input! " << endl;
 		cin.clear();
 		cin.ignore(10000, '\n');
 
@@ -818,19 +940,61 @@ void APIC::menu2(APIC apic) {
 			break;
 		}
 		case 10: {
-			cout << endl;
-			createEvent(apic);
+			return;
 			break;
 		}
 		case 11: {
 			cout << endl;
+			apic.getUserLogged().logout();
+			menu1(apic);
 			break;
 		}
-		case 12: {
-			payQuota(apic);
+		case 0: {
+			cout << "See you soon!" << endl;
+			exit(EXIT_FAILURE);
 			break;
 		}
-		case 13: {
+		}
+	} while (true);
+}
+
+void APIC::menuEvents(APIC apic) {
+	int pick;
+
+	do {
+		cout << endl << "----Events Menu----" << endl;
+		cout << "Please choose what you want to do next: " << endl;
+		cout << "1: Create event" << endl;
+		cout << "2: Promote event" << endl;
+		cout << "3: Search for an event" << endl;
+		cout << "4: Go to previous menu" << endl;
+		cout << "5: To Log Out" << endl;
+		cout << "0: To exit" << endl;
+		cout << "Your pick: ";
+		cin >> pick;
+		if (cin.fail())
+			cout << "ERROR! Wrong input! " << endl;
+		cin.clear();
+		cin.ignore(10000, '\n');
+
+		switch (pick) {
+		case 1: {
+			createEvent(apic);
+			break;
+		}
+		case 2: {
+			promoteEvent();
+			break;
+		}
+		case 3: {
+			searchEvent();
+			break;
+		}
+		case 4: {
+			return;
+			break;
+		}
+		case 5: {
 			cout << endl;
 			apic.getUserLogged().logout();
 			menu1(apic);

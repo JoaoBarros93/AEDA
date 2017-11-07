@@ -1,17 +1,27 @@
 #include "event.h"
 
-Event::Event(char type, User user, string local, string title, Date date){
+EventConference::EventConference(char type, User user, string local, string title, Date date, int numberPeople){
 	this->userCreated=user;
 	this->local=local;
 	this->date=date;
 	this->type=type;
 	this->title=title;
-}
-
-EventConference::EventConference(char type, User user, string local, string title, Date date, int numberPeople):Event(type,user,local,title,date){
 	this->numberPeople=numberPeople;
 }
 
-EventSummerSchool::EventSummerSchool(char type, User user, string local, string title, Date date, vector<User> formers):Event(type,user,local,title,date){
+EventSummerSchool::EventSummerSchool(char type, User user, string local, string title, Date date, vector<User> formers){
+	this->userCreated=user;
+	this->local=local;
+	this->date=date;
+	this->type=type;
+	this->title=title;
 	this->formers=formers;
+}
+
+vector<User > EventSummerSchool::getFormers(){
+	return formers;
+}
+
+string EventSummerSchool::getTitle(){
+	return title;
 }

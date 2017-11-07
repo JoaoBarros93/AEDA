@@ -10,7 +10,16 @@ APIC::APIC() {
 	loadUsers();
 
 	//read events file and populate events vector
-	//loadEvents();
+	loadEvents();
+
+	for(unsigned int i = 0;i<eventsSS.size();i++){
+		for(unsigned int j = 0;j<eventsSS[i].getFormers().size();j++){
+			cout << eventsSS[i].getFormers()[j].getLoginName() << endl;
+
+		}
+	}
+
+
 
 }
 
@@ -254,29 +263,31 @@ void APIC::loadAreas() {
 	}
 }
 
-/*void APIC::loadEvents() {
+void APIC::loadEvents() {
+	cout << "here loadevents" << endl;
+	stringstream ss2;
+	string line2, type;
 	fstream eventsFile("events.txt");
-	string type, line2;
-	stringstream ss, ss2;
 
 	while (eventsFile.good()) {
 		ss2.clear();
 		getline(eventsFile, line2, '\n');
 		if (line2 != "") {
-			ss2 << line2;
-			if (!getline(ss2, type, ';'))
-				cout << "Error getting type from event" << endl;
-			if (type == "c")
-				EventConference newConference(ss2);
+			getline(eventsFile, type, ';');
+			if(type=="s"){
+				ss2 << line2;
+				EventSummerSchool newSS = readSummerSchool(ss2);
 
-			else if (type == "s")
-				EventSummerSchool newSummerSchool(ss2);
-
-			else
-				cout << "ERROR! Error reading events!" << endl;
+				cout << newSS.getTitle() << endl;
+				for(unsigned int i = 0 ; i < newSS.getFormers().size();i++){
+					cout << newSS.getFormers()[i].getLoginName() << endl;
+				}
+				eventsSS.push_back(newSS);
+			}
 		}
 	}
-}*/
+
+}
 
 //GET FUNCTIONS
 User APIC::getUserLogged() {
@@ -332,9 +343,6 @@ void APIC::insertArea(Area newArea) {
 	areas.push_back(newArea);
 }
 
-void APIC::insertEvent(Event newEvent) {
-	events.push_back(newEvent);
-}
 
 //PRINT FUNCTIONS
 void APIC::printUsers() {
@@ -589,7 +597,7 @@ void APIC::promoteEvent() {
 void APIC::createEvent(APIC apic) {
 	int pick;
 	do {
-		cout << endl <<  "What type of event do you want to create? " << endl;
+		cout << endl << "What type of event do you want to create? " << endl;
 		cout << "1: Conference" << endl;
 		cout << "2: Summer School" << endl;
 		cout << "0: Exit" << endl;
@@ -694,7 +702,8 @@ void APIC::createSummerSchool(APIC apic) {
 	if (ok == 0)
 		cout << "Success! Event created! " << endl;
 
-	EventSummerSchool newSummerSchool('s', apic.getUserLogged(),local, title, date, formers);
+	EventSummerSchool newSummerSchool('s', apic.getUserLogged(), local, title,
+			date, formers);
 
 	ofstream eventsFile;
 	eventsFile.open("events.txt", ofstream::app);
@@ -704,9 +713,9 @@ void APIC::createSummerSchool(APIC apic) {
 
 	for (unsigned int i = 0; i < formers.size(); i++) {
 		if (i + 1 == formers.size()) {
-			eventsFile << formers[i].getLoginName() << ";" << endl;
+			eventsFile << formers[i].getLoginName() << "," << endl;
 		} else {
-			eventsFile << formers[i].getLoginName() << ",";
+			eventsFile << formers[i].getLoginName() << ";";
 		}
 	}
 
@@ -770,16 +779,68 @@ void APIC::createConference(APIC apic) {
 	cout << "Success! Event created! " << endl;
 	cout << "You can now message other users to promote your event!" << endl;
 
-	EventConference newConference('c', apic.getUserLogged(),local, title, date, numberPeople);
+	EventConference newConference('c', apic.getUserLogged(), local, title, date,
+			numberPeople);
 
 	ofstream eventsFile;
 	eventsFile.open("events.txt", ofstream::app);
 	eventsFile << "c;" << apic.getUserLogged().getLoginName() << ";" << local
 			<< ";" << title << ";" << date.getDay() << "/" << date.getMonth()
-			<< "/" << date.getYear() << ";" << numberPeople << endl;
+			<< "/" << date.getYear() << ";" << numberPeople << ";" << endl;
 
 	eventsFile.close();
+}
 
+EventSummerSchool APIC::readSummerSchool(stringstream& s) {
+	string typeString, newUserString, newDateString, newLocal, newTitle, newFormersString;
+	User newUser;
+	vector<User> newFormers;
+
+	//read type
+	if (!getline(s, typeString, ';'))
+		cout << "Error getting type" << endl;
+
+
+	//read user
+	if (!getline(s, newUserString, ';'))
+		cout << "Error getting user" << endl;
+
+	for(unsigned int i = 0; i <users.size();i++){
+		if(users[i].getLoginName()==newUserString)
+			newUser=users[i];
+	}
+
+	//read local
+	if (!getline(s, newLocal, ';'))
+		cout << "Error getting local" << endl;
+
+	//read title
+	if (!getline(s, newTitle, ';'))
+		cout << "Error getting title" << endl;
+
+	cout << newTitle << endl;
+
+	//read date as a string
+	if (!getline(s, newDateString, ';'))
+		cout << "Error getting date" << endl;
+
+	Date newDate(newDateString);
+
+	//read all formers
+	if (!getline(s, newFormersString, ','))
+		cout << "Error getting former" << endl;
+	istringstream iss(newFormersString);
+	string formerLoginName;
+	while (getline(iss, formerLoginName, ';')) {
+		for (unsigned int i = 0; i < users.size(); i++) {
+			if (users[i].getLoginName() == formerLoginName)
+				newFormers.push_back(users[i]);
+		}
+	}
+
+	EventSummerSchool newSS('s', newUser, newLocal, newTitle, newDate, newFormers);
+	cout << newSS.getTitle() << endl;
+	return newSS;
 }
 
 //MENUS

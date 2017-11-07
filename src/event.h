@@ -9,7 +9,7 @@
 
 using namespace std;
 
-class Event{
+class EventConference {
 private:
 	User userCreated;
 	string local;
@@ -17,22 +17,27 @@ private:
 	Date date;
 	vector<User> usersPromoted;
 	char type;
-public:
-	Event(char type, User user, string local, string title, Date date);
-};
-
-class EventConference : public Event{
-private:
 	unsigned int numberPeople;
+	vector<User> promoting;
 public:
+	EventConference(stringstream& s);
 	EventConference(char type, User user, string local, string title, Date date, int numberPeople);
 };
 
-class EventSummerSchool : public Event{
+class EventSummerSchool{
 private:
+	User userCreated;
+	string local;
+	string title;
+	Date date;
+	vector<User> usersPromoted;
+	char type;
 	vector<User> formers;
+	vector<User> promoting;
 public:
 	EventSummerSchool(char type, User user, string local, string title, Date date, vector<User> formers);
+	vector<User > getFormers();
+	string getTitle();
 };
 
 

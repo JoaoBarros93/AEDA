@@ -1,6 +1,6 @@
 #include "event.h"
 
-Event::Event(User user,string local,Date date,char type, string title){
+Event::Event(char type, User user, string local, string title, Date date){
 	this->userCreated=user;
 	this->local=local;
 	this->date=date;
@@ -8,10 +8,10 @@ Event::Event(User user,string local,Date date,char type, string title){
 	this->title=title;
 }
 
-EventConference::EventConference(unsigned int numberPeople, User user,string local, Date date, char type, string title):Event(user,local,date,type,title){
+EventConference::EventConference(char type, User user, string local, string title, Date date, int numberPeople):Event(type,user,local,title,date){
 	this->numberPeople=numberPeople;
 }
 
-EventSummerSchool::EventSummerSchool(vector<User> formers, User user,string local, Date date, char type,string title):Event(user,local,date,type,title){
+EventSummerSchool::EventSummerSchool(char type, User user, string local, string title, Date date, vector<User> formers):Event(type,user,local,title,date){
 	this->formers=formers;
 }

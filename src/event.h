@@ -18,21 +18,21 @@ private:
 	vector<User> usersPromoted;
 	char type;
 public:
-	Event(User user,string local,Date date, char type, string title);
+	Event(char type, User user, string local, string title, Date date);
 };
 
 class EventConference : public Event{
 private:
 	unsigned int numberPeople;
 public:
-	EventConference(unsigned int numberPeople, User user,string local, Date date, char type, string title);
+	EventConference(char type, User user, string local, string title, Date date, int numberPeople);
 };
 
 class EventSummerSchool : public Event{
 private:
 	vector<User> formers;
 public:
-	EventSummerSchool(vector<User> formers, User user,string local, Date date, char type, string title);
+	EventSummerSchool(char type, User user, string local, string title, Date date, vector<User> formers);
 };
 
 

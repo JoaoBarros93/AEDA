@@ -694,7 +694,7 @@ void APIC::createSummerSchool(APIC apic) {
 	if (ok == 0)
 		cout << "Success! Event created! " << endl;
 
-	EventSummerSchool newSummerSchool(formers, apic.getUserLogged(),local, date, 's', title);
+	EventSummerSchool newSummerSchool('s', apic.getUserLogged(),local, title, date, formers);
 
 	ofstream eventsFile;
 	eventsFile.open("events.txt", ofstream::app);
@@ -770,7 +770,7 @@ void APIC::createConference(APIC apic) {
 	cout << "Success! Event created! " << endl;
 	cout << "You can now message other users to promote your event!" << endl;
 
-	EventConference newConference(numberPeople, apic.getUserLogged(),local, date, 'c', title);
+	EventConference newConference('c', apic.getUserLogged(),local, title, date, numberPeople);
 
 	ofstream eventsFile;
 	eventsFile.open("events.txt", ofstream::app);

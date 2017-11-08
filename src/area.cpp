@@ -1,7 +1,6 @@
 #include "area.h"
 
 Area::Area(){
-
 }
 
 Area::Area(stringstream& s) {

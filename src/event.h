@@ -12,32 +12,36 @@ using namespace std;
 class EventConference {
 private:
 	User userCreated;
-	string local;
-	string title;
+	string local, title, area;
 	Date date;
-	vector<User> usersPromoted;
-	char type;
 	unsigned int numberPeople;
-	vector<User> promoting;
+	vector<User> usersPromoted;
 public:
-	EventConference(stringstream& s);
-	EventConference(char type, User user, string local, string title, Date date, int numberPeople);
+	EventConference(User user, string local, string title, Date date, string area, int numberPeople);
+	User getUserCreated();
+	string getLocal();
+	string getTitle();
+	Date getDate();
+	string getArea();
+	int getNumberPeople();
+
 };
 
 class EventSummerSchool{
 private:
 	User userCreated;
-	string local;
-	string title;
+	string local, title, area;
 	Date date;
 	vector<User> usersPromoted;
-	char type;
 	vector<User> formers;
-	vector<User> promoting;
 public:
-	EventSummerSchool(char type, User user, string local, string title, Date date, vector<User> formers);
-	vector<User > getFormers();
+	EventSummerSchool(User user, string local, string title, Date date, string area, vector<User> formers);
+	User getUserCreated();
+	string getLocal();
 	string getTitle();
+	Date getDate();
+	string getArea();
+	vector<User > getFormers();
 };
 
 

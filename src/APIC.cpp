@@ -736,122 +736,114 @@ void APIC::promoteEvent(APIC apic) {
 
 	if (pick == "c") {
 		printEventsC();
-		do{cout << endl << "Insert the number of the event you want to promote:"
-				<< endl;
-		cout << "Your pick: ";
-		cin >> pick2;
-		cin.clear();
-		cin.ignore(10000, '\n');}while(pick2<1 || pick2>eventsC.size());
+		do {
+			cout << endl
+					<< "Insert the number of the event you want to promote:"
+					<< endl;
+			cout << "Your pick: ";
+			cin >> pick2;
+			cin.clear();
+			cin.ignore(10000, '\n');
+		} while (pick2 < 1 || pick2 > eventsC.size());
 		for (unsigned int i = 0; i < eventsC.size(); i++) {
 			if (i + 1 == pick2) {
 				eventsC[i].insertPromoter(apic.getUserLogged());
-				//updatestatus
-				remove("eventsC.txt");
-
-				ofstream eventsCFile;
-				eventsCFile.open("eventsC.txt");
-				for (unsigned int i = 0; i < eventsC.size(); i++) {
-					if (i + 1 != pick2) {
-						eventsCFile
-								<< eventsC[i].getUserCreated().getLoginName()
-								<< ";" << eventsC[i].getLocal() << ";"
-								<< eventsC[i].getTitle() << ";"
-								<< eventsC[i].getDate().getDay() << "/"
-								<< eventsC[i].getDate().getMonth() << "/"
-								<< eventsC[i].getDate().getYear() << ";"
-								<< eventsC[i].getArea() << ";"
-								<< eventsC[i].getSupport() << ";"
-								<< eventsC[i].getNumberPeople() << ";" << endl;
-					}
-					if (i + 1 == pick2) {
-						eventsCFile
-								<< eventsC[i].getUserCreated().getLoginName()
-								<< ";" << eventsC[i].getLocal() << ";"
-								<< eventsC[i].getTitle() << ";"
-								<< eventsC[i].getDate().getDay() << "/"
-								<< eventsC[i].getDate().getMonth() << "/"
-								<< eventsC[i].getDate().getYear() << ";"
-								<< eventsC[i].getArea() << ";"
-								<< eventsC[i].getSupport() << ";"
-								<< eventsC[i].getNumberPeople() << ";"
-								<< apic.getUserLogged().getLoginName() << endl;
-					}
-				}
+				updateEventSupportC(eventsC[i]);
+				writeEventsC();
 			}
 		}
 	}
 
 	if (pick == "ss") {
 		printEventsSS();
-		do{cout << endl << "Insert the number of the event you want to promote:" << endl;
-		cout << "Your title: ";
-		cin >> pick2;
-		cin.clear();
-		cin.ignore(10000, '\n');}while(pick2<1 || pick2>(eventsSS.size()));
+		do {
+			cout << endl
+					<< "Insert the number of the event you want to promote:"
+					<< endl;
+			cout << "Your title: ";
+			cin >> pick2;
+			cin.clear();
+			cin.ignore(10000, '\n');
+		} while (pick2 < 1 || pick2 > (eventsSS.size()));
 		for (unsigned int i = 0; i < eventsSS.size(); i++) {
 			if (i + 1 == pick2) {
-				eventsSS[i].insertPromoter(apic.getUserLogged());//aqui tem que checkar se existe
-				//updatestatus
-				remove("eventsSS.txt");
-
-				ofstream eventsSSFile;
-				eventsSSFile.open("eventsSS.txt");
-				for (unsigned int i = 0; i < eventsSS.size(); i++) {
-					if (i + 1 != pick2) {
-						eventsSSFile
-								<< eventsSS[i].getUserCreated().getLoginName()
-								<< ";" << eventsSS[i].getLocal() << ";"
-								<< eventsSS[i].getTitle() << ";"
-								<< eventsSS[i].getDate().getDay() << "/"
-								<< eventsSS[i].getDate().getMonth() << "/"
-								<< eventsSS[i].getDate().getYear() << ";"
-								<< eventsSS[i].getArea() << ";"
-								<< eventsSS[i].getSupport() << ";";
-						for (unsigned int j = 0;
-								j < eventsSS[i].getFormers().size(); j++) {
-							if (j + 1 == eventsSS[i].getFormers().size()) {
-								eventsSSFile
-										<< eventsSS[i].getFormers()[j].getLoginName()
-										<< "," << endl;
-							} else {
-								eventsSSFile
-										<< eventsSS[i].getFormers()[j].getLoginName()
-										<< ";";
-							}
-						}
-					}
-					if (i + 1 == pick2) {
-						eventsSSFile
-								<< eventsSS[i].getUserCreated().getLoginName()
-								<< ";" << eventsSS[i].getLocal() << ";"
-								<< eventsSS[i].getTitle() << ";"
-								<< eventsSS[i].getDate().getDay() << "/"
-								<< eventsSS[i].getDate().getMonth() << "/"
-								<< eventsSS[i].getDate().getYear() << ";"
-								<< eventsSS[i].getArea() << ";"
-								<< eventsSS[i].getSupport() << ";";
-
-						for (unsigned int j = 0;
-								j < eventsSS[i].getFormers().size(); j++) {
-							if (j + 1 == eventsSS[i].getFormers().size()) {
-								eventsSSFile
-										<< eventsSS[i].getFormers()[j].getLoginName()
-										<< ",";
-							} else {
-								eventsSSFile
-										<< eventsSS[i].getFormers()[j].getLoginName()
-										<< ";";
-							}
-						}
-						eventsSSFile << apic.getUserLogged().getLoginName()
-								<< endl;
-
-					}
-				}
-
+				eventsSS[i].insertPromoter(apic.getUserLogged());
+				updateEventSupportSS(eventsSS[i]);
+				writeEventsSS();
 			}
 		}
 	}
+}
+
+void APIC::writeEventsSS() {
+	remove("eventsSS.txt");
+
+	ofstream eventsSSFile;
+	eventsSSFile.open("eventsSS.txt");
+	for (unsigned int i = 0; i < eventsSS.size(); i++) {
+		eventsSSFile << eventsSS[i].getUserCreated().getLoginName() << ";"
+				<< eventsSS[i].getLocal() << ";" << eventsSS[i].getTitle()
+				<< ";" << eventsSS[i].getDate().getDay() << "/"
+				<< eventsSS[i].getDate().getMonth() << "/"
+				<< eventsSS[i].getDate().getYear() << ";"
+				<< eventsSS[i].getArea() << ";" << eventsSS[i].getSupport()
+				<< ";";
+		for (unsigned int j = 0; j < eventsSS[i].getFormers().size(); j++) {
+			if (j + 1 == eventsSS[i].getFormers().size()) {
+				eventsSSFile << eventsSS[i].getFormers()[j].getLoginName()
+						<< "," << endl;
+			} else {
+				eventsSSFile << eventsSS[i].getFormers()[j].getLoginName()
+						<< ";";
+			}
+		}
+		for (unsigned int j = 0; j < eventsC[i].getUsersPromoted().size();
+				j++) {
+			if (j + 1 == eventsC[i].getUsersPromoted().size())
+				eventsSSFile << eventsC[i].getUsersPromoted()[j].getLoginName()
+						<< ",";
+			else
+				eventsSSFile << eventsC[i].getUsersPromoted()[j].getLoginName()
+						<< ";";
+		}
+
+	}
+
+}
+
+void APIC::writeEventsC() {
+	remove("eventsC.txt");
+	ofstream eventsCFile;
+	eventsCFile.open("eventsC.txt");
+	for (unsigned int i = 0; i < eventsC.size(); i++) {
+		eventsCFile << eventsC[i].getUserCreated().getLoginName() << ";"
+				<< eventsC[i].getLocal() << ";" << eventsC[i].getTitle() << ";"
+				<< eventsC[i].getDate().getDay() << "/"
+				<< eventsC[i].getDate().getMonth() << "/"
+				<< eventsC[i].getDate().getYear() << ";" << eventsC[i].getArea()
+				<< ";" << eventsC[i].getSupport() << ";"
+				<< eventsC[i].getNumberPeople() << ";";
+		for (unsigned int j = 0; j < eventsC[i].getUsersPromoted().size();
+				j++) {
+			if (j + 1 == eventsC[i].getUsersPromoted().size())
+				eventsCFile << eventsC[i].getUsersPromoted()[j].getLoginName()
+						<< ",";
+			else
+				eventsCFile << eventsC[i].getUsersPromoted()[j].getLoginName()
+						<< ";";
+		}
+	}
+}
+
+void APIC::updateEventSupportC(EventConference eventC) {
+	if (eventC.getUsersPromoted().size() >= 2 && eventC.getSupport() == 0) {
+		eventC.setSupport(1);
+	}
+}
+
+void APIC::updateEventSupportSS(EventSummerSchool eventSS) {
+	if (eventSS.getUsersPromoted().size() >= 2 && eventSS.getSupport() == 0)
+		eventSS.setSupport(1);
 }
 
 void APIC::createEvent(APIC apic) {
@@ -887,7 +879,7 @@ void APIC::createSummerSchool(APIC apic) {
 	int pick, ok = 1, error = 0;
 	bool exit = 0;
 	string local, dateString, newFormer, title, area;
-	vector<User> formers;
+	vector<User> formers, promoters;
 
 	do {
 		cout << endl
@@ -1002,7 +994,7 @@ void APIC::createSummerSchool(APIC apic) {
 		cout << "Success! Event created! " << endl;
 
 	EventSummerSchool newSummerSchool(apic.getUserLogged(), local, title, date,
-			area, 0, formers);
+			area, 0, formers, promoters);
 
 	ofstream eventsSSFile;
 	eventsSSFile.open("eventsSS.txt", ofstream::app);
@@ -1026,6 +1018,7 @@ void APIC::createConference(APIC apic) {
 	unsigned int numberPeople, error = 0;
 	bool exit = 0;
 	string local, dateString, newFormer, title, area;
+	vector<User> promoters;
 
 	do {
 		cout << endl
@@ -1118,7 +1111,7 @@ void APIC::createConference(APIC apic) {
 	cout << "You can now message other users to promote your event!" << endl;
 
 	EventConference newConference(apic.getUserLogged(), local, title, date,
-			area, 0, numberPeople);
+			area, 0, numberPeople, promoters);
 
 	ofstream eventsCFile;
 	eventsCFile.open("eventsC.txt", ofstream::app);
@@ -1135,7 +1128,7 @@ EventSummerSchool APIC::readSummerSchool(stringstream & s) {
 			newSupportString, newFormersString;
 	int newSupport;
 	User newUser;
-	vector<User> newFormers;
+	vector<User> newFormers, newPromoters;
 
 	//read user
 	if (!getline(s, newUserString, ';'))
@@ -1185,7 +1178,7 @@ EventSummerSchool APIC::readSummerSchool(stringstream & s) {
 	}
 
 	EventSummerSchool newSS(newUser, newLocal, newTitle, newDate, newArea,
-			newSupport, newFormers);
+			newSupport, newFormers, newPromoters);
 	return newSS;
 }
 
@@ -1194,6 +1187,7 @@ EventConference APIC::readConference(stringstream & s) {
 			newArea, newSupportString;
 	int newNumber, newSupport;
 	User newUser;
+	vector<User> newPromoters;
 
 	//read user
 	if (!getline(s, newUserString, ';'))
@@ -1228,14 +1222,14 @@ EventConference APIC::readConference(stringstream & s) {
 
 	newSupport = stoi(newSupportString);
 
-	//read all formers
+	//read number people
 	if (!getline(s, numberString, ';'))
 		cout << "Error getting number of people" << endl;
 
 	newNumber = stoi(numberString);
 
 	EventConference newC(newUser, newLocal, newTitle, newDate, newArea,
-			newSupport, newNumber);
+			newSupport, newNumber, newPromoters);
 	return newC;
 
 }

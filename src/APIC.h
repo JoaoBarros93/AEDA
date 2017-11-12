@@ -61,10 +61,14 @@ public:
 	void createConference(APIC apic);
 	void stringToUpper(string &s);
 	void promoteEvent(APIC apic);
+	void updateEventSupportC(EventConference eventC);
+	void updateEventSupportSS(EventSummerSchool eventS);
 	void loadUsers();
 	void loadAreas();
 	void loadEventsSS();
 	void loadEventsC();
+	void writeEventsSS();
+	void writeEventsC();
 	EventSummerSchool readSummerSchool(stringstream& s);
 	EventConference readConference(stringstream& s);
 	void menu1(APIC apic);

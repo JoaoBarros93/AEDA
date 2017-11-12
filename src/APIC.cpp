@@ -407,30 +407,63 @@ void APIC::printSubArea(string area) {
 
 void APIC::printSubAreasUser() {
 	string area;
-	do {
+
+	cout << endl << "For which area are you looking for sub areas?" << endl;
+	cout << "Type ';' or ',' will return back. " << endl;
+	cout << "Type 'area?' will show you all the areas available" << endl;
+	cout << "Your pick: ";
+	cin >> area;
+	cin.clear();
+	cin.ignore(10000, '\n');
+	if (area == "area?") {
+		printAreasFull();
 		cout << endl << "For which area are you looking for sub areas?" << endl;
 		cout << "Type ';' or ',' will return back. " << endl;
-		cout << "Type 'area?' will show you all the areas available" << endl;
 		cout << "Your pick: ";
 		cin >> area;
-		if (area == "area?") {
-			cout << "----AREAS----" << endl;
-			for (unsigned int i = 0; i < areas.size(); i++) {
-				if (i != 0) {
-					if (areas[i].getAreaName() != areas[i - 1].getAreaName())
-						cout << areas[i].getAreaName() << " - "
-								<< areas[i].getAreaNameSigla() << endl;
-				}
-			}
-		}
-
 		cin.clear();
 		cin.ignore(10000, '\n');
-		if (findSemicolon(area))
-			return;
-		printSubArea(area);
-	} while (true);
+	}
 
+	if (findSemicolon(area))
+		return;
+	stringToUpper(area);
+	cout << endl << "---Sub Areas of " << area << "---" << endl;
+	printSubArea(area);
+}
+
+void APIC::printEventsC() {
+	for (unsigned int i = 0; i < eventsC.size(); i++) {
+		cout << endl;
+
+		cout << "Event " << i + 1 << " created by "
+				<< eventsC[i].getUserCreated().getLoginName() << endl;
+		cout << "Title: " << eventsC[i].getTitle() << endl;
+		cout << "Will take place at " << eventsC[i].getLocal() << " on "
+				<< eventsC[i].getDate().getDay() << "/"
+				<< eventsC[i].getDate().getMonth() << "/"
+				<< eventsC[i].getDate().getYear() << endl;
+		cout << "We estimate " << eventsC[i].getNumberPeople()
+				<< " people will show " << endl;
+	}
+}
+
+void APIC::printEventsSS() {
+	for (unsigned int i = 0; i < eventsSS.size(); i++) {
+		cout << endl;
+		cout << "Event " << i + 1 << " created by "
+				<< eventsSS[i].getUserCreated().getLoginName() << endl;
+		cout << "Title: " << eventsSS[i].getTitle() << endl;
+		cout << "Will take place at " << eventsSS[i].getLocal() << " on "
+				<< eventsSS[i].getDate().getDay() << "/"
+				<< eventsSS[i].getDate().getMonth() << "/"
+				<< eventsSS[i].getDate().getYear() << endl;
+		cout << "The formers will be: ";
+		for (unsigned int j = 0; j < eventsSS[i].getFormers().size(); j++) {
+			cout << eventsSS[i].getFormers()[j].getLoginName() << " ";
+		}
+		cout << endl;
+	}
 }
 
 //SEARCH FUNCTIONS
@@ -473,15 +506,7 @@ void APIC::searchEventByArea() {
 		return;
 	}
 	if (area == "area?") {
-		cout << endl << "----AREAS----" << endl;
-		for (unsigned int i = 0; i < areas.size(); i++) {
-			if (i != 0) {
-				if (areas[i].getAreaName() != areas[i - 1].getAreaName())
-					cout << areas[i].getAreaName() << " - "
-							<< areas[i].getAreaNameSigla() << endl;
-			}
-		}
-
+		printAreasFull();
 		cout << endl
 				<< "Please insert the acronym of the area you are looking for: "
 				<< endl;
@@ -495,7 +520,6 @@ void APIC::searchEventByArea() {
 		}
 	}
 	stringToUpper(area);
-
 
 	for (unsigned int i = 0; i < eventsC.size(); i++) {
 		cout << endl;
@@ -527,7 +551,6 @@ void APIC::searchEventByArea() {
 				cout << eventsSS[i].getFormers()[j].getLoginName() << " ";
 			}
 			cout << endl;
-
 		}
 	}
 }
@@ -548,15 +571,7 @@ void APIC::searchUserByArea() {
 		return;
 	}
 	if (area == "area?") {
-		cout << endl << "----AREAS----" << endl;
-		for (unsigned int i = 0; i < areas.size(); i++) {
-			if (i != 0) {
-				if (areas[i].getAreaName() != areas[i - 1].getAreaName())
-					cout << areas[i].getAreaName() << " - "
-							<< areas[i].getAreaNameSigla() << endl;
-			}
-		}
-
+		printAreasFull();
 		cout << endl
 				<< "Please insert the acronym of the area you are looking for: "
 				<< endl;
@@ -701,8 +716,142 @@ void APIC::stringToUpper(string &s) {
 	}
 }
 
-void APIC::promoteEvent() {
+void APIC::promoteEvent(APIC apic) {
+	string pick;
+	unsigned int pick2;
+	bool exit = 0;
 
+	do {
+		cout << endl
+				<< "Do you want to promote a conference or a summer school "
+				<< endl;
+		cout << "'c' for conference or 'ss' for summer school" << endl;
+		cin >> pick;
+		cin.clear();
+		cin.ignore(10000, '\n');
+
+		if (pick == "c" || pick == "ss")
+			exit = 1;
+	} while (exit == 0);
+
+	if (pick == "c") {
+		printEventsC();
+		do{cout << endl << "Insert the number of the event you want to promote:"
+				<< endl;
+		cout << "Your pick: ";
+		cin >> pick2;
+		cin.clear();
+		cin.ignore(10000, '\n');}while(pick2<1 || pick2>eventsC.size());
+		for (unsigned int i = 0; i < eventsC.size(); i++) {
+			if (i + 1 == pick2) {
+				eventsC[i].insertPromoter(apic.getUserLogged());
+				//updatestatus
+				remove("eventsC.txt");
+
+				ofstream eventsCFile;
+				eventsCFile.open("eventsC.txt");
+				for (unsigned int i = 0; i < eventsC.size(); i++) {
+					if (i + 1 != pick2) {
+						eventsCFile
+								<< eventsC[i].getUserCreated().getLoginName()
+								<< ";" << eventsC[i].getLocal() << ";"
+								<< eventsC[i].getTitle() << ";"
+								<< eventsC[i].getDate().getDay() << "/"
+								<< eventsC[i].getDate().getMonth() << "/"
+								<< eventsC[i].getDate().getYear() << ";"
+								<< eventsC[i].getArea() << ";"
+								<< eventsC[i].getSupport() << ";"
+								<< eventsC[i].getNumberPeople() << ";" << endl;
+					}
+					if (i + 1 == pick2) {
+						eventsCFile
+								<< eventsC[i].getUserCreated().getLoginName()
+								<< ";" << eventsC[i].getLocal() << ";"
+								<< eventsC[i].getTitle() << ";"
+								<< eventsC[i].getDate().getDay() << "/"
+								<< eventsC[i].getDate().getMonth() << "/"
+								<< eventsC[i].getDate().getYear() << ";"
+								<< eventsC[i].getArea() << ";"
+								<< eventsC[i].getSupport() << ";"
+								<< eventsC[i].getNumberPeople() << ";"
+								<< apic.getUserLogged().getLoginName() << endl;
+					}
+				}
+			}
+		}
+	}
+
+	if (pick == "ss") {
+		printEventsSS();
+		do{cout << endl << "Insert the number of the event you want to promote:" << endl;
+		cout << "Your title: ";
+		cin >> pick2;
+		cin.clear();
+		cin.ignore(10000, '\n');}while(pick2<1 || pick2>(eventsSS.size()));
+		for (unsigned int i = 0; i < eventsSS.size(); i++) {
+			if (i + 1 == pick2) {
+				eventsSS[i].insertPromoter(apic.getUserLogged());//aqui tem que checkar se existe
+				//updatestatus
+				remove("eventsSS.txt");
+
+				ofstream eventsSSFile;
+				eventsSSFile.open("eventsSS.txt");
+				for (unsigned int i = 0; i < eventsSS.size(); i++) {
+					if (i + 1 != pick2) {
+						eventsSSFile
+								<< eventsSS[i].getUserCreated().getLoginName()
+								<< ";" << eventsSS[i].getLocal() << ";"
+								<< eventsSS[i].getTitle() << ";"
+								<< eventsSS[i].getDate().getDay() << "/"
+								<< eventsSS[i].getDate().getMonth() << "/"
+								<< eventsSS[i].getDate().getYear() << ";"
+								<< eventsSS[i].getArea() << ";"
+								<< eventsSS[i].getSupport() << ";";
+						for (unsigned int j = 0;
+								j < eventsSS[i].getFormers().size(); j++) {
+							if (j + 1 == eventsSS[i].getFormers().size()) {
+								eventsSSFile
+										<< eventsSS[i].getFormers()[j].getLoginName()
+										<< "," << endl;
+							} else {
+								eventsSSFile
+										<< eventsSS[i].getFormers()[j].getLoginName()
+										<< ";";
+							}
+						}
+					}
+					if (i + 1 == pick2) {
+						eventsSSFile
+								<< eventsSS[i].getUserCreated().getLoginName()
+								<< ";" << eventsSS[i].getLocal() << ";"
+								<< eventsSS[i].getTitle() << ";"
+								<< eventsSS[i].getDate().getDay() << "/"
+								<< eventsSS[i].getDate().getMonth() << "/"
+								<< eventsSS[i].getDate().getYear() << ";"
+								<< eventsSS[i].getArea() << ";"
+								<< eventsSS[i].getSupport() << ";";
+
+						for (unsigned int j = 0;
+								j < eventsSS[i].getFormers().size(); j++) {
+							if (j + 1 == eventsSS[i].getFormers().size()) {
+								eventsSSFile
+										<< eventsSS[i].getFormers()[j].getLoginName()
+										<< ",";
+							} else {
+								eventsSSFile
+										<< eventsSS[i].getFormers()[j].getLoginName()
+										<< ";";
+							}
+						}
+						eventsSSFile << apic.getUserLogged().getLoginName()
+								<< endl;
+
+					}
+				}
+
+			}
+		}
+	}
 }
 
 void APIC::createEvent(APIC apic) {
@@ -756,15 +905,7 @@ void APIC::createSummerSchool(APIC apic) {
 			return;
 
 		if (area == "area?") {
-			cout << endl << "----AREAS----" << endl;
-			for (unsigned int i = 0; i < areas.size(); i++) {
-				if (i != 0) {
-					if (areas[i].getAreaName() != areas[i - 1].getAreaName())
-						cout << areas[i].getAreaName() << " - "
-								<< areas[i].getAreaNameSigla() << endl;
-				}
-			}
-
+			printAreasFull();
 			cout << endl
 					<< "Please insert the acronym of the area want to add: "
 					<< endl;
@@ -861,13 +1002,13 @@ void APIC::createSummerSchool(APIC apic) {
 		cout << "Success! Event created! " << endl;
 
 	EventSummerSchool newSummerSchool(apic.getUserLogged(), local, title, date,
-			area, formers);
+			area, 0, formers);
 
 	ofstream eventsSSFile;
 	eventsSSFile.open("eventsSS.txt", ofstream::app);
-	eventsSSFile << apic.getUserLogged().getLoginName() << ";" << local
-			<< ";" << title << ";" << date.getDay() << "/" << date.getMonth()
-			<< "/" << date.getYear() << ";" << area << ";";
+	eventsSSFile << apic.getUserLogged().getLoginName() << ";" << local << ";"
+			<< title << ";" << date.getDay() << "/" << date.getMonth() << "/"
+			<< date.getYear() << ";" << area << ";" << 0 << ";";
 
 	for (unsigned int i = 0; i < formers.size(); i++) {
 		if (i + 1 == formers.size()) {
@@ -902,15 +1043,7 @@ void APIC::createConference(APIC apic) {
 			return;
 
 		if (area == "area?") {
-			cout << endl << "----AREAS----" << endl;
-			for (unsigned int i = 0; i < areas.size(); i++) {
-				if (i != 0) {
-					if (areas[i].getAreaName() != areas[i - 1].getAreaName())
-						cout << areas[i].getAreaName() << " - "
-								<< areas[i].getAreaNameSigla() << endl;
-				}
-			}
-
+			printAreasFull();
 			cout << endl
 					<< "Please insert the acronym of the area want to add: "
 					<< endl;
@@ -985,21 +1118,22 @@ void APIC::createConference(APIC apic) {
 	cout << "You can now message other users to promote your event!" << endl;
 
 	EventConference newConference(apic.getUserLogged(), local, title, date,
-			area, numberPeople);
+			area, 0, numberPeople);
 
 	ofstream eventsCFile;
 	eventsCFile.open("eventsC.txt", ofstream::app);
 	eventsCFile << apic.getUserLogged().getLoginName() << ";" << local << ";"
 			<< title << ";" << date.getDay() << "/" << date.getMonth() << "/"
-			<< date.getYear() << ";" << area << ";" << numberPeople << ";"
+			<< date.getYear() << ";" << area << ";0;" << numberPeople << ";"
 			<< endl;
 
 	eventsCFile.close();
 }
 
-EventSummerSchool APIC::readSummerSchool(stringstream& s) {
+EventSummerSchool APIC::readSummerSchool(stringstream & s) {
 	string newUserString, newDateString, newLocal, newTitle, newArea,
-			newFormersString;
+			newSupportString, newFormersString;
+	int newSupport;
 	User newUser;
 	vector<User> newFormers;
 
@@ -1030,6 +1164,12 @@ EventSummerSchool APIC::readSummerSchool(stringstream& s) {
 	if (!getline(s, newArea, ';'))
 		cout << "Error getting area" << endl;
 
+	//read support status
+	if (!getline(s, newSupportString, ';'))
+		cout << "Error getting support status" << endl;
+
+	newSupport = stoi(newSupportString);
+
 	//read all formers
 	if (!getline(s, newFormersString, ','))
 		cout << "Error getting former" << endl;
@@ -1044,14 +1184,15 @@ EventSummerSchool APIC::readSummerSchool(stringstream& s) {
 		}
 	}
 
-	EventSummerSchool newSS(newUser, newLocal, newTitle, newDate, newArea, newFormers);
+	EventSummerSchool newSS(newUser, newLocal, newTitle, newDate, newArea,
+			newSupport, newFormers);
 	return newSS;
 }
 
-EventConference APIC::readConference(stringstream& s) {
+EventConference APIC::readConference(stringstream & s) {
 	string newUserString, newDateString, newLocal, newTitle, numberString,
-			newArea;
-	int newNumber;
+			newArea, newSupportString;
+	int newNumber, newSupport;
 	User newUser;
 
 	//read user
@@ -1081,6 +1222,12 @@ EventConference APIC::readConference(stringstream& s) {
 	if (!getline(s, newArea, ';'))
 		cout << "Error getting area" << endl;
 
+	//read support status
+	if (!getline(s, newSupportString, ';'))
+		cout << "Error getting support status" << endl;
+
+	newSupport = stoi(newSupportString);
+
 	//read all formers
 	if (!getline(s, numberString, ';'))
 		cout << "Error getting number of people" << endl;
@@ -1088,7 +1235,7 @@ EventConference APIC::readConference(stringstream& s) {
 	newNumber = stoi(numberString);
 
 	EventConference newC(newUser, newLocal, newTitle, newDate, newArea,
-			newNumber);
+			newSupport, newNumber);
 	return newC;
 
 }
@@ -1128,10 +1275,10 @@ void APIC::menu1(APIC apic) {
 		case 0:
 			exit(EXIT_FAILURE);
 		default:
-			cout << "Wrong pick! Please pick again" << endl;
+			cout << "Wrong pick! Please pick again" << endl << endl;
 			break;
 		}
-	} while (pick <= 0 || pick > 2);
+	} while (true);
 }
 
 void APIC::menu2(APIC apic) {
@@ -1300,7 +1447,7 @@ void APIC::menuEvents(APIC apic) {
 			break;
 		}
 		case 2: {
-			promoteEvent();
+			promoteEvent(apic);
 			break;
 		}
 		case 3: {

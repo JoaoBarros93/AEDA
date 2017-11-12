@@ -50,6 +50,8 @@ public:
 	void printAreasSiglas();
 	void printSubAreasUser();
 	void printSubArea(string area);
+	void printEventsC();
+	void printEventsSS();
 	bool checkArea(string area);
 	bool checkSubArea(string subArea);
 	bool findSemicolon(string stringToSearch);
@@ -58,7 +60,7 @@ public:
 	void createSummerSchool(APIC apic);
 	void createConference(APIC apic);
 	void stringToUpper(string &s);
-	void promoteEvent();
+	void promoteEvent(APIC apic);
 	void loadUsers();
 	void loadAreas();
 	void loadEventsSS();

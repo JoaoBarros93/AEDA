@@ -47,6 +47,7 @@ public:
 	void logout();
 	void printAreas();
 	Area stringToArea(string areaString, vector<Area > areas);
+	void updateStatus();
 };
 
 #endif /* USER_H_ */

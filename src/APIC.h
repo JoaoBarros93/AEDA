@@ -50,6 +50,7 @@ public:
 	void printAreasSiglas();
 	void printSubAreasUser();
 	void printSubArea(string area);
+	void printEventsComplete();
 	void printEventsC();
 	void printEventsSS();
 	bool checkArea(string area);

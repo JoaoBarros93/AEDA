@@ -200,3 +200,6 @@ void User::logout() {
 		cout << "ERROR: You are already Logged out! " << endl;
 }
 
+void User::updateStatus(){
+	this->status='c';
+}

@@ -432,6 +432,14 @@ void APIC::printSubAreasUser() {
 	printSubArea(area);
 }
 
+void APIC::printEventsComplete() {
+	cout << "----Conferences----" << endl;
+	printEventsC();
+
+	cout << endl << "----Summer Schools----" << endl;
+	printEventsSS();
+}
+
 void APIC::printEventsC() {
 	for (unsigned int i = 0; i < eventsC.size(); i++) {
 		cout << endl;
@@ -445,6 +453,18 @@ void APIC::printEventsC() {
 				<< eventsC[i].getDate().getYear() << endl;
 		cout << "We estimate " << eventsC[i].getNumberPeople()
 				<< " people will show " << endl;
+		if (eventsC[i].getSupport() == 0) {
+			cout << "This event needs more people promoting it to get support "
+					<< endl;
+		} else if (eventsC[i].getSupport() == 1
+				&& eventsC[i].getNumberPeople()<30) {
+			cout
+					<< "This event can not get support. Conferences need to expect 30 people to get support "
+					<< endl;
+		} else if (eventsC[i].getSupport() == 1
+				&& eventsC[i].getNumberPeople() >= 30) {
+			cout << "This event is getting support " << endl;
+		}
 	}
 }
 
@@ -463,6 +483,17 @@ void APIC::printEventsSS() {
 			cout << eventsSS[i].getFormers()[j].getLoginName() << " ";
 		}
 		cout << endl;
+		if (eventsSS[i].getSupport() == 0) {
+			cout << "This event needs more people promoting it to get support " << endl;
+		}
+		else if (eventsSS[i].getSupport() == 1
+						&& eventsSS[i].getFormers().size()<3){
+			cout << "This event can not get support. Only summer schools with at least 3 formers get support " << endl;
+		}
+		else if (eventsSS[i].getSupport() == 1
+				&& eventsSS[i].getFormers().size()>=3) {
+			cout << "This event is getting support " << endl;
+		}
 	}
 }
 
@@ -676,6 +707,8 @@ void APIC::payQuota(APIC apic) {
 	for (unsigned int i = 0; i < users.size(); i++) {
 		if (users[i].getLoginName() == apic.getUserLogged().getLoginName()) {
 			users[i].setDatePay(todayDate);
+			users[i].updateStatus();
+			apic.userLogged.updateStatus();
 		}
 	}
 
@@ -717,62 +750,66 @@ void APIC::stringToUpper(string &s) {
 }
 
 void APIC::promoteEvent(APIC apic) {
-	string pick;
-	unsigned int pick2;
-	bool exit = 0;
+
+	unsigned int pick, pick2;
 
 	do {
-		cout << endl
-				<< "Do you want to promote a conference or a summer school "
-				<< endl;
-		cout << "'c' for conference or 'ss' for summer school" << endl;
+		cout << endl << "What type of event do you want to promote? " << endl;
+		cout << "1: Conference" << endl;
+		cout << "2: Summer School" << endl;
+		cout << "0: Exit" << endl;
+		cout << "Your pick: ";
 		cin >> pick;
 		cin.clear();
 		cin.ignore(10000, '\n');
 
-		if (pick == "c" || pick == "ss")
-			exit = 1;
-	} while (exit == 0);
-
-	if (pick == "c") {
-		printEventsC();
-		do {
-			cout << endl
-					<< "Insert the number of the event you want to promote:"
-					<< endl;
-			cout << "Your pick: ";
-			cin >> pick2;
-			cin.clear();
-			cin.ignore(10000, '\n');
-		} while (pick2 < 1 || pick2 > eventsC.size());
-		for (unsigned int i = 0; i < eventsC.size(); i++) {
-			if (i + 1 == pick2) {
-				eventsC[i].insertPromoter(apic.getUserLogged());
-				updateEventSupportC(eventsC[i]);
-				writeEventsC();
+		switch (pick) {
+		case 1:
+			printEventsC();
+			do {
+				cout << endl
+						<< "Insert the number of the event you want to promote:"
+						<< endl;
+				cout << "Your pick: ";
+				cin >> pick2;
+				cin.clear();
+				cin.ignore(10000, '\n');
+			} while (pick2 < 1 || pick2 > eventsC.size());
+			for (unsigned int i = 0; i < eventsC.size(); i++) {
+				if (i + 1 == pick2) {
+					eventsC[i].insertPromoter(apic.getUserLogged());
+					updateEventSupportC(eventsC[i]);
+					writeEventsC();
+				}
 			}
-		}
-	}
-
-	if (pick == "ss") {
-		printEventsSS();
-		do {
-			cout << endl
-					<< "Insert the number of the event you want to promote:"
-					<< endl;
-			cout << "Your title: ";
-			cin >> pick2;
-			cin.clear();
-			cin.ignore(10000, '\n');
-		} while (pick2 < 1 || pick2 > (eventsSS.size()));
-		for (unsigned int i = 0; i < eventsSS.size(); i++) {
-			if (i + 1 == pick2) {
-				eventsSS[i].insertPromoter(apic.getUserLogged());
-				updateEventSupportSS(eventsSS[i]);
-				writeEventsSS();
+			break;
+		case 2:
+			printEventsSS();
+			do {
+				cout << endl
+						<< "Insert the number of the event you want to promote:"
+						<< endl;
+				cout << "Your pick: ";
+				cin >> pick2;
+				cin.clear();
+				cin.ignore(10000, '\n');
+			} while (pick2 < 1 || pick2 > (eventsSS.size()));
+			for (unsigned int i = 0; i < eventsSS.size(); i++) {
+				if (i + 1 == pick2) {
+					eventsSS[i].insertPromoter(apic.getUserLogged());
+					updateEventSupportSS(eventsSS[i]);
+					writeEventsSS();
+				}
 			}
+			break;
+		case 0:
+			return;
+			break;
+		default:
+			cout << "Wrong pick! Please pick again" << endl;
+			break;
 		}
-	}
+	} while (pick <= 0 || pick > 2);
 }
 
 void APIC::writeEventsSS() {
@@ -791,24 +828,25 @@ void APIC::writeEventsSS() {
 		for (unsigned int j = 0; j < eventsSS[i].getFormers().size(); j++) {
 			if (j + 1 == eventsSS[i].getFormers().size()) {
 				eventsSSFile << eventsSS[i].getFormers()[j].getLoginName()
-						<< "," << endl;
+						<< ",";
+				if (eventsSS[i].getUsersPromoted().size() == 0) {
+					cout << endl;
+				}
 			} else {
 				eventsSSFile << eventsSS[i].getFormers()[j].getLoginName()
 						<< ";";
 			}
 		}
-		for (unsigned int j = 0; j < eventsC[i].getUsersPromoted().size();
+		for (unsigned int j = 0; j < eventsSS[i].getUsersPromoted().size();
 				j++) {
-			if (j + 1 == eventsC[i].getUsersPromoted().size())
-				eventsSSFile << eventsC[i].getUsersPromoted()[j].getLoginName()
-						<< ",";
+			if (j + 1 == eventsSS[i].getUsersPromoted().size())
+				eventsSSFile << eventsSS[i].getUsersPromoted()[j].getLoginName()
+						<< "," << endl;
 			else
-				eventsSSFile << eventsC[i].getUsersPromoted()[j].getLoginName()
+				eventsSSFile << eventsSS[i].getUsersPromoted()[j].getLoginName()
 						<< ";";
 		}
-
 	}
-
 }
 
 void APIC::writeEventsC() {
@@ -823,11 +861,14 @@ void APIC::writeEventsC() {
 				<< eventsC[i].getDate().getYear() << ";" << eventsC[i].getArea()
 				<< ";" << eventsC[i].getSupport() << ";"
 				<< eventsC[i].getNumberPeople() << ";";
+		if (eventsC[i].getUsersPromoted().size() == 0) {
+			eventsCFile << endl;
+		}
 		for (unsigned int j = 0; j < eventsC[i].getUsersPromoted().size();
 				j++) {
 			if (j + 1 == eventsC[i].getUsersPromoted().size())
 				eventsCFile << eventsC[i].getUsersPromoted()[j].getLoginName()
-						<< ",";
+						<< "," << endl;
 			else
 				eventsCFile << eventsC[i].getUsersPromoted()[j].getLoginName()
 						<< ";";
@@ -837,13 +878,22 @@ void APIC::writeEventsC() {
 
 void APIC::updateEventSupportC(EventConference eventC) {
 	if (eventC.getUsersPromoted().size() >= 2 && eventC.getSupport() == 0) {
-		eventC.setSupport(1);
+		for (unsigned int i = 0; i < eventsC.size(); i++) {
+			if (eventsC[i].getTitle() == eventC.getTitle()) {
+				eventsC[i].setSupport(1);
+			}
+		}
 	}
 }
 
 void APIC::updateEventSupportSS(EventSummerSchool eventSS) {
-	if (eventSS.getUsersPromoted().size() >= 2 && eventSS.getSupport() == 0)
-		eventSS.setSupport(1);
+	if (eventSS.getUsersPromoted().size() >= 2 && eventSS.getSupport() == 0) {
+		for (unsigned int i = 0; i < eventsSS.size(); i++) {
+			if (eventsSS[i].getTitle() == eventSS.getTitle()) {
+				eventsSS[i].setSupport(1);
+			}
+		}
+	}
 }
 
 void APIC::createEvent(APIC apic) {
@@ -950,15 +1000,28 @@ void APIC::createSummerSchool(APIC apic) {
 
 	Date date(dateString);
 
-	cout
-			<< "Please insert a title for the event: (Semicolon will return back. Please do not use spaces) "
-			<< endl;
-	cin >> title;
-	cin.clear();
-	cin.ignore(10000, '\n');
-	//try to find ";" in title
-	if (findSemicolon(title))
-		return;
+	bool find = 0;
+	do {
+		find = 0;
+		cout
+				<< "Please insert a title for the event: (Semicolon will return back. Please do not use spaces) "
+				<< endl;
+		cin >> title;
+		cin.clear();
+		cin.ignore(10000, '\n');
+		//try to find ";" in title
+		if (findSemicolon(title))
+			return;
+
+		for (unsigned int i = 0; i < eventsSS.size(); i++) {
+			if (eventsSS[i].getTitle() == title) {
+				find = 1;
+				cout
+						<< "Sorry. There is an event with that title already. Please create an unique title "
+						<< endl;
+			}
+		}
+	} while (find == 1);
 
 	cout << endl;
 	printUsers();
@@ -995,6 +1058,8 @@ void APIC::createSummerSchool(APIC apic) {
 
 	EventSummerSchool newSummerSchool(apic.getUserLogged(), local, title, date,
 			area, 0, formers, promoters);
+
+	eventsSS.push_back(newSummerSchool);
 
 	ofstream eventsSSFile;
 	eventsSSFile.open("eventsSS.txt", ofstream::app);
@@ -1048,7 +1113,6 @@ void APIC::createConference(APIC apic) {
 			if (findSemicolon(area)) {
 				return;
 			}
-
 		}
 		stringToUpper(area);
 		if (checkArea(area)) {
@@ -1088,15 +1152,29 @@ void APIC::createConference(APIC apic) {
 
 	Date date(dateString);
 
-	cout
-			<< "Please insert a title for the event: (Semicolon will return back. Please dont use spaces) "
-			<< endl;
-	cin >> title;
-	cin.clear();
-	cin.ignore(10000, '\n');
-	//try to find ";" in title
-	if (findSemicolon(title))
-		return;
+	bool find = 0;
+	do {
+		find = 0;
+		cout
+				<< "Please insert a title for the event: (Semicolon will return back. Please do not use spaces) "
+				<< endl;
+		cin >> title;
+		cin.clear();
+		cin.ignore(10000, '\n');
+		//try to find ";" in title
+		if (findSemicolon(title))
+			return;
+
+		for (unsigned int i = 0; i < eventsC.size(); i++) {
+			if (eventsC[i].getTitle() == title) {
+				find = 1;
+				cout
+						<< "Sorry. There is an event with that title already. Please create an unique title "
+						<< endl;
+			}
+		}
+
+	} while (find == 1);
 
 	cout
 			<< "Please insert the number of people you think that will show for this event: "
@@ -1113,6 +1191,8 @@ void APIC::createConference(APIC apic) {
 	EventConference newConference(apic.getUserLogged(), local, title, date,
 			area, 0, numberPeople, promoters);
 
+	eventsC.push_back(newConference);
+
 	ofstream eventsCFile;
 	eventsCFile.open("eventsC.txt", ofstream::app);
 	eventsCFile << apic.getUserLogged().getLoginName() << ";" << local << ";"
@@ -1125,7 +1205,7 @@ void APIC::createConference(APIC apic) {
 
 EventSummerSchool APIC::readSummerSchool(stringstream & s) {
 	string newUserString, newDateString, newLocal, newTitle, newArea,
-			newSupportString, newFormersString;
+			newSupportString, newFormersString, newPromotersString;
 	int newSupport;
 	User newUser;
 	vector<User> newFormers, newPromoters;
@@ -1177,6 +1257,19 @@ EventSummerSchool APIC::readSummerSchool(stringstream & s) {
 		}
 	}
 
+	//read all promoters
+	getline(s, newPromotersString, ',');
+
+	istringstream iss2(newPromotersString);
+	string promoterLoginName;
+	while (getline(iss2, promoterLoginName, ';')) {
+		for (unsigned int i = 0; i < users.size(); i++) {
+			if (users[i].getLoginName() == promoterLoginName) {
+				newPromoters.push_back(users[i]);
+			}
+		}
+	}
+
 	EventSummerSchool newSS(newUser, newLocal, newTitle, newDate, newArea,
 			newSupport, newFormers, newPromoters);
 	return newSS;
@@ -1184,7 +1277,7 @@ EventSummerSchool APIC::readSummerSchool(stringstream & s) {
 
 EventConference APIC::readConference(stringstream & s) {
 	string newUserString, newDateString, newLocal, newTitle, numberString,
-			newArea, newSupportString;
+			newArea, newSupportString, newPromotersString;
 	int newNumber, newSupport;
 	User newUser;
 	vector<User> newPromoters;
@@ -1227,6 +1320,19 @@ EventConference APIC::readConference(stringstream & s) {
 		cout << "Error getting number of people" << endl;
 
 	newNumber = stoi(numberString);
+
+	//read all promoters
+	getline(s, newPromotersString, ',');
+
+	istringstream iss(newPromotersString);
+	string promoterLoginName;
+	while (getline(iss, promoterLoginName, ';')) {
+		for (unsigned int i = 0; i < users.size(); i++) {
+			if (users[i].getLoginName() == promoterLoginName) {
+				newPromoters.push_back(users[i]);
+			}
+		}
+	}
 
 	EventConference newC(newUser, newLocal, newTitle, newDate, newArea,
 			newSupport, newNumber, newPromoters);
@@ -1334,18 +1440,19 @@ void APIC::menuSearch(APIC apic) {
 	do {
 		cout << endl << "----Search and Print Menu----" << endl;
 		cout << "Please choose what you want to do next: " << endl;
-		cout << "1: See all other users names" << endl;
-		cout << "2: See every information of all users" << endl;
-		cout << "3: Search for an user by its name" << endl;
-		cout << "4: Search for all users in an area" << endl;
-		cout << "5: Search for all users in an subarea" << endl;
-		cout << "6: Search for an event" << endl;
-		cout << "7: Print all areas of interest with complete information "
+		cout << "1: Print all user names" << endl;
+		cout << "2: Print every information of all users" << endl;
+		cout << "3: Print all events " << endl;
+		cout << "4: Search for an user by its name" << endl;
+		cout << "5: Search for all users in an area" << endl;
+		cout << "6: Search for all users in an subarea" << endl;
+		cout << "7: Search for an event" << endl;
+		cout << "8: Print all areas of interest with complete information "
 				<< endl;
-		cout << "8: Print all areas of interest, but just siglas " << endl;
-		cout << "9: Look for the subareas of an area" << endl;
-		cout << "10: Go to previous menu" << endl;
-		cout << "11: To Log Out" << endl;
+		cout << "9: Print all areas of interest, but just siglas " << endl;
+		cout << "10: Look for the subareas of an area" << endl;
+		cout << "11: Go to previous menu" << endl;
+		cout << "12: To Log Out" << endl;
 		cout << "0: To exit" << endl;
 		cout << "Your pick: ";
 		cin >> pick;
@@ -1364,44 +1471,49 @@ void APIC::menuSearch(APIC apic) {
 			break;
 		}
 		case 3: {
-			searchUser();
+			printEventsComplete();
 			break;
 		}
 		case 4: {
 			cout << endl;
-			searchUserByArea();
+			searchUser();
 			break;
 		}
 		case 5: {
 			cout << endl;
-			searchUserBySubArea();
+			searchUserByArea();
 			break;
 		}
 		case 6: {
 			cout << endl;
-			searchEventByArea();
+			searchUserBySubArea();
 			break;
 		}
 		case 7: {
 			cout << endl;
-			printAreasFull();
+			searchEventByArea();
 			break;
 		}
 		case 8: {
 			cout << endl;
-			printAreasSiglas();
+			printAreasFull();
 			break;
 		}
 		case 9: {
 			cout << endl;
-			printSubAreasUser();
+			printAreasSiglas();
 			break;
 		}
 		case 10: {
-			return;
+			cout << endl;
+			printSubAreasUser();
 			break;
 		}
 		case 11: {
+			return;
+			break;
+		}
+		case 12: {
 			cout << endl;
 			apic.getUserLogged().logout();
 			menu1(apic);
@@ -1437,11 +1549,31 @@ void APIC::menuEvents(APIC apic) {
 
 		switch (pick) {
 		case 1: {
-			createEvent(apic);
+			for (unsigned int i = 0; i < users.size(); i++) {
+				if (users[i].getLoginName() == apic.getUserLogged().getLoginName()) {
+					if (users[i].getStatus() == 'c') {
+						createEvent(apic);
+					} else {
+						cout
+								<< "Sorry! You need to be a contributer to create an event! "
+								<< endl;
+					}
+				}
+			}
 			break;
 		}
 		case 2: {
-			promoteEvent(apic);
+			for (unsigned int i = 0; i < users.size(); i++) {
+				if (users[i].getLoginName() == apic.getUserLogged().getLoginName()) {
+					if (users[i].getStatus() == 'c') {
+						promoteEvent(apic);
+					} else {
+						cout
+								<< "Sorry! You need to be a contributer to promote an event! "
+								<< endl;
+					}
+				}
+			}
 			break;
 		}
 		case 3: {

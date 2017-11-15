@@ -14,6 +14,7 @@
 #include "area.h"
 #include "date.h"
 #include "event.h"
+#include "message.h"
 
 using namespace std;
 
@@ -50,7 +51,6 @@ public:
 	void printAreasSiglas();
 	void printSubAreasUser();
 	void printSubArea(string area);
-	void printEventsComplete();
 	void printEventsC();
 	void printEventsSS();
 	bool checkArea(string area);
@@ -60,22 +60,20 @@ public:
 	void createEvent(APIC apic);
 	void createSummerSchool(APIC apic);
 	void createConference(APIC apic);
+	void createMessage(APIC apic);
 	void stringToUpper(string &s);
 	void promoteEvent(APIC apic);
-	void updateEventSupportC(EventConference eventC);
-	void updateEventSupportSS(EventSummerSchool eventS);
 	void loadUsers();
 	void loadAreas();
 	void loadEventsSS();
 	void loadEventsC();
-	void writeEventsSS();
-	void writeEventsC();
 	EventSummerSchool readSummerSchool(stringstream& s);
 	EventConference readConference(stringstream& s);
 	void menu1(APIC apic);
 	void menu2(APIC apic);
 	void menuSearch(APIC apic);
 	void menuEvents(APIC apic);
+	void menuMessages(APIC apic);
 };
 
 #endif /* APIC_H_ */

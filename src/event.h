@@ -18,7 +18,7 @@ private:
 	vector<User> usersPromoted;
 	int support; //0=no 1=yes
 public:
-	EventConference(User user, string local, string title, Date date, string area, int supported, int numberPeople, vector<User> promoters);
+	EventConference(User user, string local, string title, Date date, string area, int supported, int numberPeople);
 	User getUserCreated();
 	string getLocal();
 	string getTitle();
@@ -26,9 +26,7 @@ public:
 	string getArea();
 	int getNumberPeople();
 	int getSupport();
-	vector<User> getUsersPromoted();
 	void insertPromoter(User user);
-	void setSupport(int newSup);
 };
 
 class EventSummerSchool{
@@ -40,7 +38,7 @@ private:
 	vector<User> formers;
 	int support; //0=no 1=yes
 public:
-	EventSummerSchool(User user, string local, string title, Date date, string area, int supported, vector<User> formers, vector<User> promoters);
+	EventSummerSchool(User user, string local, string title, Date date, string area, int supported, vector<User> formers);
 	User getUserCreated();
 	string getLocal();
 	string getTitle();
@@ -48,9 +46,7 @@ public:
 	string getArea();
 	vector<User > getFormers();
 	int getSupport();
-	vector<User> getUsersPromoted();
 	void insertPromoter(User user);
-	void setSupport(int newSup);
 };
 
 

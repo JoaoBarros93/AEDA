@@ -146,6 +146,10 @@ void User::setDatePay(Date date) {
 	this->datePay = date;
 }
 
+void User::setStatus(char newStatus){
+	this->status=newStatus;
+}
+
 //PRINT FUNCTIONS
 void User::printAreas() {
 	for (unsigned int i = 0; i < areasString.size(); i++) {
@@ -200,6 +204,3 @@ void User::logout() {
 		cout << "ERROR: You are already Logged out! " << endl;
 }
 
-void User::updateStatus(){
-	this->status='c';
-}

@@ -23,6 +23,8 @@ private:
 	bool loggedIn;
 	Date datePay;
 	char status; //c=contributor, s=subscriber; i=inactive
+	int sent;
+	int recieved;
 	vector <string> areasString;
 	vector <Area> areas;
 public:
@@ -43,11 +45,11 @@ public:
 	int getTodayYear();
 	void insertArea(Area newArea);
 	void setDatePay(Date date);
+	void setStatus(char newStatus);
 	void login();
 	void logout();
 	void printAreas();
 	Area stringToArea(string areaString, vector<Area > areas);
-	void updateStatus();
 };
 
 #endif /* USER_H_ */

@@ -8,7 +8,7 @@ User::User() {
 
 User::User(stringstream& s, vector<Area> areas) {
 	stringstream ss;
-	string newLoginName, newPassword, newInstitution, newAreas, newDateString;
+	string newLoginName, newPassword, newInstitution, newAreas, newDateString, sentString, receivedString;
 
 	//read login
 	if (!getline(s, newLoginName, ';'))
@@ -43,6 +43,22 @@ User::User(stringstream& s, vector<Area> areas) {
 	this->dateString = dateString;
 	Date newDate(newDateString);
 	this->datePay=newDate;
+
+	//read sent
+	if (!getline(s, sentString, ';'))
+		cout << "Error getting sent" << endl;
+	ss << sentString;
+	ss >> sentString;
+	ss.clear();
+	this->sent = stoi(sentString);
+
+	//read received
+	if (!getline(s, receivedString, ';'))
+		cout << "Error getting received" << endl;
+	ss << receivedString;
+	ss >> receivedString;
+	ss.clear();
+	this->received = stoi(receivedString);
 
 	//read all areas
 	if (!getline(s, newAreas, ','))
@@ -137,6 +153,13 @@ nowLocal = *localtime(&now);
 return nowLocal.tm_year + 1900;
 }
 
+int User::getSent(){
+	return sent;
+}
+
+int User::getReceived(){
+	return received;
+}
 //SET FUNCTIONS
 void User::insertArea(Area newArea) {
 	this->areas.push_back(newArea);
@@ -150,6 +173,13 @@ void User::setStatus(char newStatus){
 	this->status=newStatus;
 }
 
+void User::setReceived(int newReceived){
+	this->received=newReceived;
+}
+
+void User::setSent(int newSent){
+	this->sent=newSent;
+}
 //PRINT FUNCTIONS
 void User::printAreas() {
 	for (unsigned int i = 0; i < areasString.size(); i++) {

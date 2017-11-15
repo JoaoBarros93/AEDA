@@ -12,7 +12,6 @@ APIC::APIC() {
 	//read events file and populate events vector
 	loadEventsSS();
 	loadEventsC();
-
 }
 
 bool APIC::login(int n, APIC apic) {
@@ -204,7 +203,7 @@ bool APIC::regist(APIC apic) {
 	ofstream usersFile;
 	usersFile.open("users.txt", ofstream::app);
 	usersFile << username << ";" << password << ";" << institution << ";"
-			<< date << ";";
+			<< date << ";0;0;";
 
 	for (unsigned int i = 0; i < areaVector.size(); i++) {
 		if (i + 1 == areaVector.size()) {
@@ -1136,7 +1135,7 @@ void APIC::createMessage(APIC apic){
 	int pick;
 	string areaString,msg;
 	vector<string> areasS;
-	vector<User> recievers;
+	vector<User> receivers;
 	do {
 		cout << endl << "Please insert the area that you want to share this message with: " << endl;
 		cout << "Enter 'area?' to display all areas. " << endl;
@@ -1197,7 +1196,7 @@ void APIC::createMessage(APIC apic){
 	if(areaString == "all"){
 		for(unsigned int i =0;i<users.size();i++){
 			if(users[i].getStatus()=='c' || users[i].getStatus()=='s')
-				recievers.push_back(users[i]);
+				receivers.push_back(users[i]);
 		}
 	}
 	else {
@@ -1208,39 +1207,89 @@ void APIC::createMessage(APIC apic){
 						k++) {
 					if (areasS[i]
 							== users[j].getVectorAreas()[k].getAreaNameSigla()) {
-						for (unsigned int l = 0; l < recievers.size(); l++) {
-							if (recievers[l].getLoginName()== users[j].getLoginName())
+						for (unsigned int l = 0; l < receivers.size(); l++) {
+							if (receivers[l].getLoginName()== users[j].getLoginName())
 								find = 1;
 						}
 						if (find == 0) {
-							recievers.push_back(users[j]);
+							receivers.push_back(users[j]);
 						}
-
 					}
 				}
-
 			}
 		}
 	}
 
-	Message newMessage(apic.getUserLogged(), todayDate, msg, recievers);
+	//increments the number of messages this user has sent
+	for(unsigned int i=0;i<users.size();i++){
+		if(apic.getUserLogged().getLoginName()==users[i].getLoginName())
+			users[i].setSent(users[i].getSent()+1);
+	}
 
-		ofstream msgFile;
-		msgFile.open("msg.txt", ofstream::app);
-		msgFile << apic.getUserLogged().getLoginName() << ";" << todayDate.getDay() << "/" << todayDate.getMonth() << "/"<< todayDate.getYear() << ";" << msg << ";";
-		if(recievers.size()==0)
-			msgFile << endl;
-
-		for(unsigned int i = 0;i<recievers.size();i++){
-			if(i+1==recievers.size())
-				msgFile << recievers[i].getLoginName() << "," << endl;
-			else
-				msgFile << recievers[i].getLoginName() << ";";
+	//increments the number of messages received for all users that will receive this message
+	for(unsigned int i =0;i<receivers.size();i++){
+		for(unsigned int j =0;j<users.size();j++){
+			if(receivers[i].getLoginName()==users[j].getLoginName()){
+				users[j].setReceived(users[j].getReceived()+1);
+			}
 		}
+	}
 
-		msgFile.close();
+	//re-writes the users file with the new sent/received
+	remove("users.txt");
+
+	ofstream usersFile;
+	usersFile.open("users.txt");
+	for (unsigned int i = 0; i < users.size(); i++) {
+		usersFile << users[i].getLoginName() << ";" << users[i].getPassword()
+				<< ";" << users[i].getInstitution() << ";"
+				<< users[i].getDatePay().getDay() << "/"
+				<< users[i].getDatePay().getMonth() << "/"
+				<< users[i].getDatePay().getYear() << ";" << users[i].getSent()
+				<< ";" << users[i].getReceived() << ";";
+
+		for (unsigned int j = 0; j < users[i].getVectorAreasString().size();
+				j++) {
+			if (j + 1 == users[i].getVectorAreasString().size()) {
+				usersFile << users[i].getVectorAreas()[j].getAreaNameSigla()
+						<< "-"
+						<< users[i].getVectorAreas()[j].getSubAreaNameSigla()
+						<< "," << endl;
+			} else {
+				usersFile << users[i].getVectorAreas()[j].getAreaNameSigla()
+						<< "-"
+						<< users[i].getVectorAreas()[j].getSubAreaNameSigla()
+						<< ";";
+			}
+		}
+	}
+
+	usersFile.close();
+
+	//creates the message and puts it in messages vector
+	Message newMessage(apic.getUserLogged(), todayDate, msg, receivers);
+	messages.push_back(newMessage);
+
+	//writes to the msg.txt
+	ofstream msgFile;
+	msgFile.open("msg.txt", ofstream::app);
+	msgFile << apic.getUserLogged().getLoginName() << ";" << todayDate.getDay()
+			<< "/" << todayDate.getMonth() << "/" << todayDate.getYear() << ";"
+			<< msg << ";";
+	if (receivers.size() == 0)
+		msgFile << endl;
+
+	for (unsigned int i = 0; i < receivers.size(); i++) {
+		if (i + 1 == receivers.size())
+			msgFile << receivers[i].getLoginName() << "," << endl;
+		else
+			msgFile << receivers[i].getLoginName() << ";";
+	}
+
+	msgFile.close();
 
 }
+
 EventSummerSchool APIC::readSummerSchool(stringstream & s) {
 	string newUserString, newDateString, newLocal, newTitle, newArea,
 			newSupportString, newFormersString;

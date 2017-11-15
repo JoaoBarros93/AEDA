@@ -25,6 +25,7 @@ private:
 	vector<Area > areas;
 	vector<EventSummerSchool > eventsSS;
 	vector<EventConference > eventsC;
+	vector<Message> messages;
 	bool userLoggedStatus = userLogged.getLoggedIn();
 public:
 	APIC();

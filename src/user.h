@@ -24,7 +24,7 @@ private:
 	Date datePay;
 	char status; //c=contributor, s=subscriber; i=inactive
 	int sent;
-	int recieved;
+	int received;
 	vector <string> areasString;
 	vector <Area> areas;
 public:
@@ -43,9 +43,13 @@ public:
 	int getTodayDay();
 	int getTodayMonth();
 	int getTodayYear();
+	int getSent();
+	int getReceived();
 	void insertArea(Area newArea);
 	void setDatePay(Date date);
 	void setStatus(char newStatus);
+	void setReceived(int newReceived);
+	void setSent(int newSent);
 	void login();
 	void logout();
 	void printAreas();

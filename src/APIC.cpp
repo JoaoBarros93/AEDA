@@ -377,21 +377,25 @@ void APIC::printUsersComplete() {
 void APIC::printAreasFull() {
 	cout << "----AREAS----" << endl;
 	for (unsigned int i = 0; i < areas.size(); i++) {
-		if (i != 0) {
-			if (areas[i].getAreaName() != areas[i - 1].getAreaName())
-				cout << areas[i].getAreaName() << " - "
-						<< areas[i].getAreaNameSigla() << endl;
-		}
+		if (i == 0)
+			cout << areas[i].getAreaName() << " - " << areas[i].getAreaNameSigla() << endl;
+		else if (areas[i].getAreaName() != areas[i - 1].getAreaName())
+				cout << areas[i].getAreaName() << " - " << areas[i].getAreaNameSigla() << endl;
+
 	}
 }
 
 void APIC::printAreasSiglas() {
+	vector <string> singleAreas;
 	cout << "----AREAS----" << endl;
 	for (unsigned int i = 0; i < areas.size(); i++) {
-		if (i != 0) {
-			if (areas[i].getAreaNameSigla() != areas[i - 1].getAreaNameSigla())
-				cout << areas[i].getAreaNameSigla() << endl;
-		}
+		if (i == 0)
+			singleAreas.push_back(areas[i].getAreaNameSigla());
+		else if (areas[i].getAreaNameSigla() != areas[i - 1].getAreaNameSigla())
+			singleAreas.push_back(areas[i].getAreaNameSigla());
+}
+	for(unsigned int i =0;i<singleAreas.size();i+=3){
+		cout << singleAreas[i] << " " << singleAreas[i+1] << " " << singleAreas[i+2] << endl;
 	}
 }
 

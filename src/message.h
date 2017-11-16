@@ -15,6 +15,10 @@ private:
 
 public:
 	Message(User userSent, Date date, string msg,vector<User> usersReceived);
+	string getMessage();
+	vector<User> getUsersReceived();
+	User getUserSent();
+	Date getDate();
 
 };
 

@@ -12,6 +12,9 @@ APIC::APIC() {
 	//read events file and populate events vector
 	loadEventsSS();
 	loadEventsC();
+
+	//read messages file and populate messages vector
+	loadMessages();
 }
 
 bool APIC::login(int n, APIC apic) {
@@ -42,7 +45,7 @@ bool APIC::login(int n, APIC apic) {
 				&& users[i].getPassword() == password) {
 			users[i].login();
 			apic.setUserLogged(users[i]);
-			cout << "Login Sucessful!" << endl;
+			cout << "Login Successful!" << endl;
 			menu2(apic);
 		}
 	}
@@ -72,7 +75,7 @@ bool APIC::regist(APIC apic) {
 
 	cout << endl << "Select your username (semicolon or comma will exit): "
 			<< endl;
-	cout << "Username: ";
+	cout << "User name: ";
 	cin >> username;
 	cin.clear();
 	cin.ignore(10000, '\n');
@@ -286,6 +289,22 @@ void APIC::loadEventsC() {
 	}
 }
 
+void APIC::loadMessages(){
+	fstream msgFile("msg.txt");
+	string line2;
+	stringstream ss2;
+
+	while (msgFile.good()) {
+		ss2.clear();
+		getline(msgFile, line2, '\n');
+		if (line2 != "") {
+			ss2 << line2;
+			Message newMessage = readMessage(ss2);
+			insertMessage(newMessage);
+		}
+	}
+}
+
 //GET FUNCTIONS
 User APIC::getUserLogged() {
 	return userLogged;
@@ -348,6 +367,10 @@ void APIC::insertEventC(EventConference newEventC) {
 	eventsC.push_back(newEventC);
 }
 
+void APIC::insertMessage(Message newMessage){
+	messages.push_back(newMessage);
+}
+
 //PRINT FUNCTIONS
 void APIC::printUsers() {
 	cout << "All users: " << endl;
@@ -381,21 +404,20 @@ void APIC::printAreasFull() {
 			cout << areas[i].getAreaName() << " - " << areas[i].getAreaNameSigla() << endl;
 		else if (areas[i].getAreaName() != areas[i - 1].getAreaName())
 				cout << areas[i].getAreaName() << " - " << areas[i].getAreaNameSigla() << endl;
-
 	}
 }
 
 void APIC::printAreasSiglas() {
 	vector <string> singleAreas;
-	cout << "----AREAS----" << endl;
+	cout << "-------AREAS-------" << endl;
 	for (unsigned int i = 0; i < areas.size(); i++) {
 		if (i == 0)
 			singleAreas.push_back(areas[i].getAreaNameSigla());
 		else if (areas[i].getAreaNameSigla() != areas[i - 1].getAreaNameSigla())
 			singleAreas.push_back(areas[i].getAreaNameSigla());
 }
-	for(unsigned int i =0;i<singleAreas.size();i+=3){
-		cout << singleAreas[i] << " " << singleAreas[i+1] << " " << singleAreas[i+2] << endl;
+	for(unsigned int i =0;i<singleAreas.size();i+=5){
+		cout << singleAreas[i] << " " << singleAreas[i+1] << " " << singleAreas[i+2] << " " << singleAreas[i+3] << " " << singleAreas[i+4] << endl;
 	}
 }
 
@@ -468,6 +490,19 @@ void APIC::printEventsSS() {
 		cout << endl;
 	}
 }
+
+void APIC::printMessage(User receiver){
+	for(unsigned int i=0;i<messages.size();i++){
+		for(unsigned int j=0;j<messages[i].getUsersReceived().size();j++){
+			if(messages[i].getUsersReceived()[j].getLoginName()==receiver.getLoginName()){
+				cout << "Sent by: " << messages[i].getUserSent().getLoginName() << " on "  << endl;
+				messages[i].getDate();
+				cout << "Message: " << messages[i].getMessage() << endl << endl;
+			}
+		}
+	}
+}
+
 
 //SEARCH FUNCTIONS
 void APIC::searchUser() {
@@ -1278,20 +1313,21 @@ void APIC::createMessage(APIC apic){
 	ofstream msgFile;
 	msgFile.open("msg.txt", ofstream::app);
 	msgFile << apic.getUserLogged().getLoginName() << ";" << todayDate.getDay()
-			<< "/" << todayDate.getMonth() << "/" << todayDate.getYear() << ";"
-			<< msg << ";";
+			<< "/" << todayDate.getMonth() << "/" << todayDate.getYear() << ";";
 	if (receivers.size() == 0)
 		msgFile << endl;
 
 	for (unsigned int i = 0; i < receivers.size(); i++) {
 		if (i + 1 == receivers.size())
-			msgFile << receivers[i].getLoginName() << "," << endl;
+			msgFile << receivers[i].getLoginName() << ",";
 		else
 			msgFile << receivers[i].getLoginName() << ";";
 	}
 
+	msgFile << msg << endl;
 	msgFile.close();
 
+	cout << "Message sent! " << endl;
 }
 
 EventSummerSchool APIC::readSummerSchool(stringstream & s) {
@@ -1401,6 +1437,47 @@ EventConference APIC::readConference(stringstream & s) {
 	EventConference newC(newUser, newLocal, newTitle, newDate, newArea,
 			newSupport, newNumber);
 	return newC;
+}
+
+Message APIC::readMessage(stringstream& s){
+	string newUserString, newDateString, newReceiverString, newMessage;
+	User newUser;
+	vector<User> newReceivers;
+
+	//read user
+	if (!getline(s, newUserString, ';'))
+		cout << "Error getting user" << endl;
+
+	for (unsigned int i = 0; i < users.size(); i++) {
+		if (users[i].getLoginName() == newUserString)
+			newUser = users[i];
+	}
+
+	//read date as a string
+	if (!getline(s, newDateString, ';'))
+		cout << "Error getting date" << endl;
+
+	Date newDate(newDateString);
+
+	//read all receivers
+	if (!getline(s, newReceiverString, ','))
+		cout << "Error getting receiver" << endl;
+
+	istringstream iss(newReceiverString);
+	string receiverLoginName;
+	while (getline(iss, receiverLoginName, ';')) {
+		for (unsigned int i = 0; i < users.size(); i++) {
+			if (users[i].getLoginName() == receiverLoginName)
+				newReceivers.push_back(users[i]);
+		}
+	}
+
+	//read message
+	if (!getline(s, newMessage, ';'))
+		cout << "Error getting message" << endl;
+
+	Message newMsg(newUser, newDate, newMessage, newReceivers);
+	return newMsg;
 }
 
 
@@ -1663,7 +1740,7 @@ void APIC::menuMessages(APIC apic) {
 			break;
 		}
 		case 2: {
-
+			printMessage(apic.getUserLogged());
 			break;
 		}
 		case 3: {

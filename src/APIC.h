@@ -42,6 +42,7 @@ public:
 	void insertArea(Area newArea);
 	void insertEventSS(EventSummerSchool newEventSS);
 	void insertEventC(EventConference newEventC);
+	void insertMessage(Message newMessage);
 	void searchUser();
 	void searchEventByArea();
 	void searchUserByArea();
@@ -54,6 +55,7 @@ public:
 	void printSubArea(string area);
 	void printEventsC();
 	void printEventsSS();
+	void printMessage(User receiver);
 	bool checkArea(string area);
 	bool checkSubArea(string subArea);
 	bool findSemicolon(string stringToSearch);
@@ -68,8 +70,10 @@ public:
 	void loadAreas();
 	void loadEventsSS();
 	void loadEventsC();
+	void loadMessages();
 	EventSummerSchool readSummerSchool(stringstream& s);
 	EventConference readConference(stringstream& s);
+	Message readMessage(stringstream& s);
 	void menu1(APIC apic);
 	void menu2(APIC apic);
 	void menuSearch(APIC apic);

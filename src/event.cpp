@@ -10,8 +10,6 @@ EventSummerSchool::EventSummerSchool(User user, string local, string title, Date
 	this->support=support;
 }
 
-
-
 User EventSummerSchool::getUserCreated() {
 	return userCreated;
 }

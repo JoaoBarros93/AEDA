@@ -29,20 +29,24 @@ private:
 	bool userLoggedStatus = userLogged.getLoggedIn();
 public:
 	APIC();
-	bool regist(APIC apic);
-	bool login(int n, APIC apic);
+
+	//GET FUNCTIONS
 	User getUserLogged();
 	bool getStatus();
 	int getTodayDay();
 	int getTodayMonth();
 	int getTodayYear();
 	Date getTodayDate();
+
+	//SET FUNCTIONS
 	void setUserLogged(User userLogged);
 	void insertUser(User newuser);
 	void insertArea(Area newArea);
 	void insertEventSS(EventSummerSchool newEventSS);
 	void insertEventC(EventConference newEventC);
 	void insertMessage(Message newMessage);
+
+	//SEARCH AND PRINT FUNCTIONS
 	void searchUser();
 	void searchEventByArea();
 	void searchUserByArea();
@@ -56,29 +60,43 @@ public:
 	void printEventsC();
 	void printEventsSS();
 	void printMessage(User receiver);
+
+	//CHECK FUNCTIONS
 	bool checkArea(string area);
 	bool checkSubArea(string subArea);
-	bool findSemicolon(string stringToSearch);
-	void payQuota(APIC apic);
+
+	//CREATE FUNCTIONS
 	void createEvent(APIC apic);
 	void createSummerSchool(APIC apic);
 	void createConference(APIC apic);
 	void createMessage(APIC apic);
-	void stringToUpper(string &s);
-	void promoteEvent(APIC apic);
+
+	//LOAD FUNCTIONS
 	void loadUsers();
 	void loadAreas();
 	void loadEventsSS();
 	void loadEventsC();
 	void loadMessages();
+
+	//READ FUNCTIONS
 	EventSummerSchool readSummerSchool(stringstream& s);
 	EventConference readConference(stringstream& s);
 	Message readMessage(stringstream& s);
+
+	//MENU FUNCTIONS
 	void menu1(APIC apic);
 	void menu2(APIC apic);
 	void menuSearch(APIC apic);
 	void menuEvents(APIC apic);
 	void menuMessages(APIC apic);
+
+	//OTHER FUNCTIONS
+	bool findSemicolon(string stringToSearch);
+	void payQuota(APIC apic);
+	void stringToUpper(string &s);
+	void promoteEvent(APIC apic);
+	bool regist(APIC apic);
+	bool login(int n, APIC apic);
 };
 
 #endif /* APIC_H_ */

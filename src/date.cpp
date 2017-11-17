@@ -11,7 +11,6 @@ Date::Date(unsigned int day, unsigned int month, unsigned int year) {
 }
 
 Date::Date(string dateString) {
-
 	vector<string> tokens;
 	regex re("\\d+");
 	stringstream day, month, year;
@@ -22,18 +21,22 @@ Date::Date(string dateString) {
 
 	for (unsigned int i = 0; i < tokens.size(); i++) {
 		if (i == 0) {
+			//checks format of day
 			if (stoi(tokens[i]) < 1 || stoi(tokens[i]) > 31) {
 				cout << "ERROR! Wrong date format! " << endl;
 				return;
 			}
+			//checks format of month
 			if (stoi(tokens[i + 1]) < 1 || stoi(tokens[i + 1]) > 12) {
 				cout << "ERROR! Wrong date format! " << endl;
 				return;
 			}
+			//checks format of year
 			if (stoi(tokens[i + 2]) < 1900 || stoi(tokens[i + 2]) > 2099) {
 				cout << "ERROR! Wrong date format! " << endl;
 				return;
 			}
+			//converts to int
 			this->day = stoi(tokens[i]);
 			this->month = stoi(tokens[i + 1]);
 			this->year = stoi(tokens[i + 2]);
@@ -99,10 +102,12 @@ void Date::setDate(unsigned int day, unsigned int month, unsigned int year) {
 	this->year = year;
 }
 
+//returns true if year is bissextus
 bool Date::isBissesto(unsigned int ano) {
 	return (ano % 4 == 0 && ((ano % 100 != 0) || (ano % 400 == 0)));
 }
 
+//returns true if date is future and false if it is not future
 bool Date::isFuture() {
 	Date todayDate = getTodayDate();
 
@@ -147,6 +152,7 @@ void Date::printDate() {
 	cout << getDay() << "/" << getMonth() << "/" << getYear() << endl;
 }
 
+//checks if last date of pay is longer than 5 years
 bool Date::isSub(Date dateToCompare) {
 	int day2 = dateToCompare.getDay();
 	int month2 = dateToCompare.getMonth();
@@ -168,6 +174,7 @@ bool Date::isSub(Date dateToCompare) {
 	return false;
 }
 
+//checks if last date of pay is last year
 bool Date::isContributor(Date dateToCompare) {
 	int year2 = dateToCompare.getYear();
 	if (this->year + 1 >= year2)

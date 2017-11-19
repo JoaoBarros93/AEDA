@@ -7,24 +7,25 @@ Area::Area(stringstream& s) {
 	string newAreaName, newSubAreaName, newAreaNameSigla, newSubAreaNameSigla;
 
 	if (!getline(s, newAreaName, ';'))
-		cout << "Error getting area name" << endl;
+		cout << "Error reading area name" << endl;
 
 	this->areaName = newAreaName;
 
 	if (!getline(s, newSubAreaName, ';'))
-		cout << "Error getting sub area name" << endl;
+		cout << "Error reading sub area name" << endl;
 
 	this->subAreaName = newSubAreaName;
 
 	if (!getline(s, newAreaNameSigla, ';'))
-		cout << "Error getting area name acronym" << endl;
+		cout << "Error reading area name acronym" << endl;
 
 	this->areaNameSigla = newAreaNameSigla;
 
 	if (!getline(s, newSubAreaNameSigla, ';'))
-		cout << "Error getting sub area name acronym" << endl;
+		cout << "Error reading sub area name acronym" << endl;
 
 	this->subAreaNameSigla = newSubAreaNameSigla;
+
 }
 
 string Area::getAreaName() {

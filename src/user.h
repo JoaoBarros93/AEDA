@@ -11,6 +11,7 @@
 #include <ctime>
 #include "area.h"
 #include "date.h"
+#include "exceptions.h"
 
 using namespace std;
 

@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include "exceptions.h"
 
 using namespace std;
 

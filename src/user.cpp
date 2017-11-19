@@ -12,7 +12,7 @@ User::User(stringstream& s, vector<Area> areas) {
 
 	//read login
 	if (!getline(s, newLoginName, ';'))
-		cout << "Error getting login name" << endl;
+		cout << "Error reading login name" << endl;
 	ss << newLoginName;
 	ss >> loginName;
 	ss.clear();
@@ -20,7 +20,7 @@ User::User(stringstream& s, vector<Area> areas) {
 
 	//read password
 	if (!getline(s, newPassword, ';'))
-		cout << "Error getting password" << endl;
+		cout << "Error reading password" << endl;
 	ss << newPassword;
 	ss >> password;
 	ss.clear();
@@ -28,7 +28,7 @@ User::User(stringstream& s, vector<Area> areas) {
 
 	//read institution
 	if (!getline(s, newInstitution, ';'))
-		cout << "Error getting institution" << endl;
+		cout << "Error reading institution " << endl;
 	ss << newInstitution;
 	ss >> institution;
 	ss.clear();
@@ -36,7 +36,7 @@ User::User(stringstream& s, vector<Area> areas) {
 
 	//read date as a string
 	if (!getline(s, newDateString, ';'))
-		cout << "Error getting date" << endl;
+		cout << "Error reading date " << endl;
 	ss << newDateString;
 	ss >> dateString;
 	ss.clear();
@@ -46,7 +46,7 @@ User::User(stringstream& s, vector<Area> areas) {
 
 	//read sent
 	if (!getline(s, sentString, ';'))
-		cout << "Error getting sent" << endl;
+		cout << "Error reading sent " << endl;
 	ss << sentString;
 	ss >> sentString;
 	ss.clear();
@@ -54,7 +54,7 @@ User::User(stringstream& s, vector<Area> areas) {
 
 	//read received
 	if (!getline(s, receivedString, ';'))
-		cout << "Error getting received" << endl;
+		cout << "Error reading received " << endl;
 	ss << receivedString;
 	ss >> receivedString;
 	ss.clear();
@@ -62,7 +62,7 @@ User::User(stringstream& s, vector<Area> areas) {
 
 	//read all areas
 	if (!getline(s, newAreas, ','))
-		cout << "Error getting area" << endl;
+		cout << "Error reading area " << endl;
 	istringstream iss(newAreas);
 	string newArea;
 	while (getline(iss, newArea, ';')) {

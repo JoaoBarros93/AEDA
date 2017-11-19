@@ -15,6 +15,7 @@
 #include "date.h"
 #include "event.h"
 #include "message.h"
+#include "exceptions.h"
 
 using namespace std;
 
@@ -64,6 +65,8 @@ public:
 	//CHECK FUNCTIONS
 	bool checkArea(string area);
 	bool checkSubArea(string subArea);
+	bool checkStatusC(APIC apic); //true if user logged is contributer
+	bool checkStatusI(APIC apic); //true if user logged is inactive
 
 	//CREATE FUNCTIONS
 	void createEvent(APIC apic);
@@ -83,6 +86,10 @@ public:
 	EventConference readConference(stringstream& s);
 	Message readMessage(stringstream& s);
 
+	//WRITE FUNCTIONS
+	void writeEventsSS();
+	void writeEventsC();
+
 	//MENU FUNCTIONS
 	void menu1(APIC apic);
 	void menu2(APIC apic);
@@ -91,12 +98,15 @@ public:
 	void menuMessages(APIC apic);
 
 	//OTHER FUNCTIONS
-	bool findSemicolon(string stringToSearch);
-	void payQuota(APIC apic);
+	bool findSemicolon(string stringToSearch); //returns true if string has semicolon
+	void payQuota(APIC apic); //sets pay date to today date
 	void stringToUpper(string &s);
 	void promoteEvent(APIC apic);
 	bool regist(APIC apic);
 	bool login(int n, APIC apic);
+	void updateEventSupportC(EventConference eventC);
+	void updateEventSupportSS(EventSummerSchool eventS);
+
 };
 
 #endif /* APIC_H_ */

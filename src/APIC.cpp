@@ -91,9 +91,9 @@ void APIC::insertMessage(Message newMessage) {
 ******************PRINT FUNCTIONS******************
 **************************************************/
 void APIC::printUsers() {
-	cout << "All users: " << endl;
+	cout << endl << "---All users--- " << endl;
 	for (unsigned int i = 0; i < users.size(); i++) {
-		cout << users[i].getLoginName() << endl;
+		cout << i+1 << ": " << users[i].getLoginName() << endl;
 	}
 }
 
@@ -152,12 +152,19 @@ void APIC::printSubArea(string area) {
 	}
 }
 
+void APIC::printAreasAndSub(){
+	cout << endl << "----------All areas and sub areas----------" << endl;
+	for(unsigned int i =0;i<areas.size();i++){
+		cout << i+1 << " Subarea: " << areas[i].getSubAreaName() << " --------> Subarea Acronym: " << areas[i].getAreaNameSigla() << "-" << areas[i].getSubAreaNameSigla() << endl;
+	}
+}
+
 void APIC::printSubAreasUser() {
 	string area;
+	bool find = 0;
 
-	cout << endl << "For which area are you looking for sub areas?" << endl;
-	cout << "Type ';' or ',' will return back. " << endl;
-	cout << "Type 'area?' will show you all the areas available" << endl;
+	cout << "For which area are you looking for sub areas?" << endl;
+	cout << "Type 'area?' to show  all areas available or semicolon to return" << endl;
 	cout << "Your pick: ";
 	cin >> area;
 	cin.clear();
@@ -165,67 +172,121 @@ void APIC::printSubAreasUser() {
 
 	//if area = "area?"  prints all areas
 	if (area == "area?") {
+		cout << endl;
 		printAreasFull();
-		cout << endl << "For which area are you looking for sub areas?" << endl;
-		cout << "Type ';' or ',' will return back. " << endl;
+		cout << endl << "For which area are you looking for sub areas (semicolon will return) ?" << endl;
 		cout << "Your pick: ";
 		cin >> area;
 		cin.clear();
 		cin.ignore(10000, '\n');
 	}
 
-	//fins semicolon in area
+	//finds semicolon in area
 	if (findSemicolon(area))
 		return;
 	stringToUpper(area);//turns area into capital letter
-	cout << endl << "---Sub Areas of " << area << "---" << endl;
-	printSubArea(area);
+
+	for(unsigned int i = 0 ; i <areas.size();i++){
+		if(areas[i].getAreaNameSigla()==area)
+			find=1;
+	}
+
+	if (find == 1) {
+		cout << endl << "---Sub Areas of " << area << "---" << endl;
+		printSubArea(area);
+	}
+	else
+		cout << endl << "Sorry! Area not found! " << endl;
 }
 
 void APIC::printEventsC() {
-	//prints complete information about all conferences
 	for (unsigned int i = 0; i < eventsC.size(); i++) {
 		cout << endl;
-		cout << "Event " << i + 1 << " created by " << eventsC[i].getUserCreated().getLoginName() << endl;
+
+		cout << "Event " << i + 1 << " created by "
+				<< eventsC[i].getUserCreated().getLoginName() << endl;
 		cout << "Title: " << eventsC[i].getTitle() << endl;
 		cout << "Will take place at " << eventsC[i].getLocal() << " on "
 				<< eventsC[i].getDate().getDay() << "/"
 				<< eventsC[i].getDate().getMonth() << "/"
 				<< eventsC[i].getDate().getYear() << endl;
-		cout << "We estimate " << eventsC[i].getNumberPeople() << " people will show " << endl;
+		cout << "We estimate " << eventsC[i].getNumberPeople()
+				<< " people will show " << endl;
+		if (eventsC[i].getSupport() == 0) {
+			cout << "This event needs more people promoting it to get support "
+					<< endl;
+		} else if (eventsC[i].getSupport() == 1
+				&& eventsC[i].getNumberPeople()<30) {
+			cout
+					<< "This event can not get support. Conferences need to expect 30 people to get support "
+					<< endl;
+		} else if (eventsC[i].getSupport() == 1
+				&& eventsC[i].getNumberPeople() >= 30) {
+			cout << "This event is getting support " << endl;
+		}
 	}
 }
 
 void APIC::printEventsSS() {
-	//prints complete information about all summer schools
 	for (unsigned int i = 0; i < eventsSS.size(); i++) {
 		cout << endl;
-		cout << "Event " << i + 1 << " created by " << eventsSS[i].getUserCreated().getLoginName() << endl;
+		cout << "Event " << i + 1 << " created by "
+				<< eventsSS[i].getUserCreated().getLoginName() << endl;
 		cout << "Title: " << eventsSS[i].getTitle() << endl;
 		cout << "Will take place at " << eventsSS[i].getLocal() << " on "
 				<< eventsSS[i].getDate().getDay() << "/"
 				<< eventsSS[i].getDate().getMonth() << "/"
 				<< eventsSS[i].getDate().getYear() << endl;
 		cout << "The formers will be: ";
-		//prints all formers
 		for (unsigned int j = 0; j < eventsSS[i].getFormers().size(); j++) {
 			cout << eventsSS[i].getFormers()[j].getLoginName() << " ";
 		}
 		cout << endl;
+		if (eventsSS[i].getSupport() == 0) {
+			cout << "This event needs more people promoting it to get support " << endl;
+		}
+		else if (eventsSS[i].getSupport() == 1
+						&& eventsSS[i].getFormers().size()<3){
+			cout << "This event can not get support. Only summer schools with at least 3 formers get support " << endl;
+		}
+		else if (eventsSS[i].getSupport() == 1
+				&& eventsSS[i].getFormers().size()>=3) {
+			cout << "This event is getting support " << endl;
+		}
 	}
 }
 
+void APIC::printEvents(){
+	cout << "----Conferences----" << endl;
+	printEventsC();
+	cout << endl << "----Summer Schools----" << endl;
+	printEventsSS();
+}
+
 void APIC::printMessage(User receiver) {
-	cout << endl << "Your messages: " << endl;
+	bool find = 0;
+
 	//for all messages, find user in received vector
-	for (unsigned int i = 0; i<messages.size(); i++) {
-		for (unsigned int j = 0; j<messages[i].getUsersReceived().size();j++) {
-			if (messages[i].getUsersReceived()[j].getLoginName() == receiver.getLoginName()) {
-				cout << "Sent by: " << messages[i].getUserSent().getLoginName()
-						<< " on " << messages[i].getDate().getDay() << "/"
-						<< messages[i].getDate().getMonth() << "/"
-						<< messages[i].getDate().getYear() << endl;
-				cout << "Message: " << messages[i].getMessage() << endl << endl;
+	for (unsigned int i = 0; i < messages.size(); i++) {
+		for (unsigned int j = 0; j < messages[i].getUsersReceived().size();j++) {
+			if (messages[i].getUsersReceived()[j].getLoginName()== receiver.getLoginName())
+				find = 1;
+		}
+	}
+
+	if (find == 0) {
+		cout << endl << "Sorry! You do not have any messages yet! " << endl;
+	} else {
+		cout << endl << "Your messages:" << endl;
+		for (unsigned int i = 0; i<messages.size(); i++) {
+			for (unsigned int j = 0; j<messages[i].getUsersReceived().size();j++) {
+				if (messages[i].getUsersReceived()[j].getLoginName() == receiver.getLoginName()) {
+					cout << "Sent by: " << messages[i].getUserSent().getLoginName()
+							<< " on " << messages[i].getDate().getDay() << "/"
+							<< messages[i].getDate().getMonth() << "/"
+							<< messages[i].getDate().getYear() << endl;
+					cout << "Message: " << messages[i].getMessage() << endl << endl;
+				}
 			}
 		}
 	}
@@ -236,7 +297,8 @@ void APIC::printMessage(User receiver) {
 ***************************************************************/
 void APIC::searchUser() {
 	string user;
-	cout << "Please, insert the login name of the user you are trying to find: " << endl;
+	bool find = 0;
+	cout << endl << "Please, insert the login name of the user you are trying to find: " << endl;
 	cout << "Your pick: ";
 	cin >> user;
 	cin.clear();
@@ -245,22 +307,35 @@ void APIC::searchUser() {
 	//finds user in users vector
 	for (unsigned int i = 0; i < users.size(); i++) {
 		if (users[i].getLoginName() == user) {
-			cout << "User found! " << endl;
+			find = 1;
+			cout << endl << "User found! " << endl;
 			cout << "Login name: " << users[i].getLoginName() << endl;
 			cout << "Institution: " << users[i].getInstitution() << endl;
-			cout << "Scientific areas of interest: " << endl;
-			//prints all areas
-			for (unsigned int j = 0; j < users[i].getVectorAreas().size();j++) {
-				cout << users[i].getVectorAreasString()[j] << endl;
+			cout << "Date of last quota payment: " << users[i].getDateString() << endl;
+			if (users[i].getStatus() == 'c')
+				cout << users[i].getLoginName() << " is a contributer" << endl;
+			if (users[i].getStatus() == 's')
+				cout << users[i].getLoginName() << " is a subscriber" << endl;
+			if (users[i].getStatus() == 'i')
+				cout << users[i].getLoginName() << " is inactive" << endl;
+			cout << users[i].getLoginName() << " has sent " << users[i].getSent() << " messages and received " << users[i].getReceived() << endl;
+			//print all areas of the user
+			for (unsigned int j = 0; j < users[i].getVectorAreasString().size();j++) {
+				cout << "Area" << j + 1 << " " << users[i].getVectorAreasString()[j] << endl;
 			}
 		}
+	}
+
+	if(find==0){
+		cout << endl << "User not found! " << endl;
 	}
 }
 
 void APIC::searchEventByArea() {
+	bool find = 0, find2 = 0;
 	string area;
-	cout << endl << "Please insert the acronym of the area you are looking for: " << endl;
-	cout << "Insert 'area?' will print all areas. Insert semicolon will return" << endl;
+	cout << "Please insert the acronym of the area you are looking for: " << endl;
+	cout << "Insert 'area?' to print all areas or semicolon to return" << endl;
 	cout << "Your pick: ";
 	cin >> area;
 	cin.clear();
@@ -270,9 +345,9 @@ void APIC::searchEventByArea() {
 		return;
 	}
 	if (area == "area?") {//if area == "area?" prints all areas
+		cout << endl;
 		printAreasFull();
-		cout << endl << "Please insert the acronym of the area you are looking for: "<< endl;
-		cout << "Insert semicolon will return" << endl;
+		cout << endl << "Please insert the acronym of the area you are looking for (insert semicolon to return): "<< endl;
 		cout << "Your pick: ";
 		cin >> area;
 		cin.clear();
@@ -285,35 +360,58 @@ void APIC::searchEventByArea() {
 
 	//prints all conferences in selected area
 	for (unsigned int i = 0; i < eventsC.size(); i++) {
-		cout << endl;
-		if (eventsC[i].getArea() == area) {
-			cout << "Event created by " << eventsC[i].getUserCreated().getLoginName() << endl;
-			cout << "Title: " << eventsC[i].getTitle() << endl;
-			cout << "Will take place at " << eventsC[i].getLocal() << " on "
-					<< eventsC[i].getDate().getDay() << "/"
-					<< eventsC[i].getDate().getMonth() << "/"
-					<< eventsC[i].getDate().getYear() << endl;
-			cout << "We estimate " << eventsC[i].getNumberPeople() << " people will show " << endl;
-		}
+		if (eventsC[i].getArea() == area)
+			find = 1;
 	}
 
 	//prints all summer schools in selected area
 	for (unsigned int i = 0; i < eventsSS.size(); i++) {
-		cout << endl;
-		if (eventsSS[i].getArea() == area) {
-			cout << "Event created by " << eventsSS[i].getUserCreated().getLoginName() << endl;
-			cout << "Title: " << eventsSS[i].getTitle() << endl;
-			cout << "Will take place at " << eventsSS[i].getLocal() << " on "
-					<< eventsSS[i].getDate().getDay() << "/"
-					<< eventsSS[i].getDate().getMonth() << "/"
-					<< eventsSS[i].getDate().getYear() << endl;
-			//prints all formers
-			cout << "The formers will be: ";
-			for (unsigned int j = 0; j < eventsSS[i].getFormers().size(); j++) {
-				cout << eventsSS[i].getFormers()[j].getLoginName() << " ";
+		if (eventsSS[i].getArea() == area)
+			find2 = 1;
+	}
+
+	if (find == 0)
+		cout << endl << "There are no conferences in that area!" << endl;
+	else {
+		cout << endl << "Conferences in that area: " << endl;
+		for (unsigned int i = 0; i < eventsC.size(); i++) {
+			if (eventsC[i].getArea() == area) {
+				cout << "Event created by "
+						<< eventsC[i].getUserCreated().getLoginName() << endl;
+				cout << "Title: " << eventsC[i].getTitle() << endl;
+				cout << "Will take place at " << eventsC[i].getLocal() << " on "
+						<< eventsC[i].getDate().getDay() << "/"
+						<< eventsC[i].getDate().getMonth() << "/"
+						<< eventsC[i].getDate().getYear() << endl;
+				cout << "We estimate " << eventsC[i].getNumberPeople()
+						<< " people will show " << endl;
 			}
-			cout << endl;
 		}
+	}
+
+	if (find2 == 0)
+		cout << endl << "There are no summer schools in that area! " << endl;
+	else {
+		cout << endl <<"Summer schools in that area: " << endl;
+		for (unsigned int i = 0; i < eventsC.size(); i++) {
+			if (eventsC[i].getArea() == area) {
+				cout << "Event created by "
+						<< eventsSS[i].getUserCreated().getLoginName() << endl;
+				cout << "Title: " << eventsSS[i].getTitle() << endl;
+				cout << "Will take place at " << eventsSS[i].getLocal()
+						<< " on " << eventsSS[i].getDate().getDay() << "/"
+						<< eventsSS[i].getDate().getMonth() << "/"
+						<< eventsSS[i].getDate().getYear() << endl;
+				//prints all formers
+				cout << "The formers will be: ";
+				for (unsigned int j = 0; j < eventsSS[i].getFormers().size();
+						j++) {
+					cout << eventsSS[i].getFormers()[j].getLoginName() << " ";
+				}
+				cout << endl;
+			}
+		}
+
 	}
 }
 
@@ -321,7 +419,7 @@ void APIC::searchUserByArea() {
 	string area;
 	vector<string> usersVector;
 	cout << endl << "Please insert the acronym of the area you are looking for: " << endl;
-	cout << "Insert 'area?' will print all areas. Insert semicolon will return" << endl;
+	cout << "Insert 'area?' to print all areas or semicolon to return" << endl;
 	cout << "Your pick: ";
 	cin >> area;
 	cin.clear();
@@ -334,8 +432,7 @@ void APIC::searchUserByArea() {
 
 	if (area == "area?") {//if area == "area?" prints areas
 		printAreasFull();
-		cout << endl << "Please insert the acronym of the area you are looking for: " << endl;
-		cout << "Insert semicolon will return" << endl;
+		cout << endl << "Please insert the acronym of the area you are looking for (insert semicolon to return): " << endl;
 		cout << "Your pick: ";
 		cin >> area;
 		cin.clear();
@@ -345,9 +442,12 @@ void APIC::searchUserByArea() {
 		if (findSemicolon(area)) {
 			return;
 		}
+
+		stringToUpper(area);
 	}
 
-	cout << "Users in that area: " << endl;
+	stringToUpper(area);
+
 	//for all users looks if area is in user areas vector. If it is inserts it in usersVector
 	for (unsigned int i = 0; i < users.size(); i++) {
 		for (unsigned int j = 0; j < users[i].getVectorAreas().size(); j++) {
@@ -360,9 +460,15 @@ void APIC::searchUserByArea() {
 	auto last = unique(usersVector.begin(), usersVector.end());
 	usersVector.erase(last, usersVector.end());
 
-	//prints what is left in vector
-	for (unsigned int i = 0; i < usersVector.size(); i++) {
-		cout << usersVector[i] << endl;
+	if(usersVector.size()==0){
+		cout << endl << "Sorry! Did not find any user with " << area << " in areas" << endl;
+	}
+	else {
+		cout << endl << "Users with " << area << " in areas:" << endl;
+		//prints what is left in vector
+		for (unsigned int i = 0; i < usersVector.size(); i++) {
+			cout << i+1 << ": " << usersVector[i] << endl;
+		}
 	}
 }
 
@@ -370,7 +476,8 @@ void APIC::searchUserBySubArea() {
 	string area;
 	vector<string> usersVector;
 	cout << "Please insert the acronym of the area and sub area you want to search in the format: 'XXX-XXX':" << endl;
-	cout << "Your area and sub area: " << endl;
+	cout << "Insert 'area?' to print all areas and subareas or semicolon to return" << endl;
+	cout << "Your area and sub area: ";
 	cin >> area;
 	cin.clear();
 	cin.ignore(10000, '\n');
@@ -379,7 +486,17 @@ void APIC::searchUserBySubArea() {
 	if (findSemicolon(area))
 		return;
 
-	cout << "Users in that area: " << endl;
+	if(area=="area?"){
+		printAreasAndSub();
+		cout << endl << "Please insert the acronym of the area and sub area you want to search in the format: 'XXX-XXX' (semicolon will return) :" << endl;
+		cout << "Your area and sub area: ";
+		cin >> area;
+		cin.clear();
+		cin.ignore(10000, '\n');
+	}
+
+	stringToUpper(area);
+
 	//for all users try to find the area in the user areas vector. if finds inserts user in usersVector
 	for (unsigned int i = 0; i < users.size(); i++) {
 		for (unsigned int j=0; j<users[i].getVectorAreasString().size();j++) {
@@ -392,9 +509,15 @@ void APIC::searchUserBySubArea() {
 	auto last = unique(usersVector.begin(), usersVector.end());
 	usersVector.erase(last, usersVector.end());
 
-	//prints what is left in vector
-	for (unsigned int i = 0; i < usersVector.size(); i++) {
-		cout << usersVector[i] << endl;
+	if(usersVector.size()==0){
+		cout << endl << "Sorry! Did not find any user with " << area << " in areas" << endl;
+	}
+	else {
+		cout << endl << "Users with " << area << " in areas:" << endl;
+		//prints what is left in vector
+		for (unsigned int i = 0; i < usersVector.size(); i++) {
+			cout << i+1 << ": " << usersVector[i] << endl;
+		}
 	}
 }
 /************************************************************
@@ -752,10 +875,8 @@ void APIC::createMessage(APIC apic) {
 	//chose by area
 	if(pick2==1){
 		do { //exits if user do not want to add more areas
-			cout << endl << "Please insert the area that you want to share this message with: " << endl;
-			cout << "Enter 'area?' to display all areas. " << endl;
-			cout << "Enter 'all' will share this message with all areas " << endl;
-			cout << "Enter semicolon or comma will return back " << endl;
+			cout << endl << "Please insert the area that you want to share this message with (semicolon will return): " << endl;
+			cout << "Enter 'area?' to display all areas or enter 'all' will share this message with all areas " << endl;
 			cout << "Your pick: ";
 			cin >> areaString;
 			cin.clear();
@@ -768,8 +889,7 @@ void APIC::createMessage(APIC apic) {
 			if (areaString == "area?") {
 				//prints all areas
 				printAreasFull();
-				cout << endl << "Please insert the acronym of the area want to add: " << endl;
-				cout << "Insert semicolon will return" << endl;
+				cout << endl << "Please insert the acronym of the area want to add: (semicolon will return) " << endl;
 				cout << "Your pick: ";
 				cin >> areaString;
 				cin.clear();
@@ -839,10 +959,8 @@ void APIC::createMessage(APIC apic) {
 		do { //leaves when user does not want to add more receivers
 			do { //leaves when user is found
 				find2 = 0;
-				cout << endl << "Insert the name of the user you want to send this message: " << endl;
-				cout << "Semicolon will return back " << endl;
-				cout << "Type 'users?' to print all usernames" << endl;
-				cout << "Type 'all' to send message to all users" << endl;
+				cout << endl << "Insert the name of the user you want to send this message (semicolon will return back): " << endl;
+				cout << "Type 'users?' to print all usernames or type 'all' to send message to all users" << endl;
 				cout << "User: ";
 				cin >> newUserString;
 				cin.clear();
@@ -852,9 +970,8 @@ void APIC::createMessage(APIC apic) {
 
 				if(newUserString=="users?"){
 					printUsers();
-					cout << endl << "Insert the name of the user you want to send this message: " << endl;
+					cout << endl << "Insert the name of the user you want to send this message (semicolon will return back): " << endl;
 					cout << "Type 'all' to send message to all users" << endl;
-					cout << "Semicolon will return back " << endl;
 					cout << "User: ";
 					cin >> newUserString;
 					cin.clear();
@@ -885,13 +1002,14 @@ void APIC::createMessage(APIC apic) {
 						cout << "Sorry! Could not find your user. Try again. " << endl;
 					else {
 						cout << endl << newUserString << " will receive your message." << endl;
+						do{
 						cout << "Do you want to sent the message to more users? " << endl;
 						cout << "1: Yes" << endl;
 						cout << "2: No" << endl;
 						cout << "Pick: ";
 						cin >> pick3;
 						cin.clear();
-						cin.ignore(10000, '\n');
+						cin.ignore(10000, '\n');}while(pick3!=1 && pick3!=2);
 					}
 				}
 			} while (find2 == 0);
@@ -1312,6 +1430,7 @@ void APIC::writeEventsC() {
  ****************OTHER FUNCTIONS********************************
  **************************************************************/
 bool APIC::login(int n, APIC apic) {
+	cout << endl <<  "-----LOGGIN IN-----" << endl;
 	APIC apic_ = apic;
 	ifstream usersFile("users.txt");
 
@@ -1319,7 +1438,7 @@ bool APIC::login(int n, APIC apic) {
 	int loginTry = n;
 
 	//read username
-	cout << endl << "Enter username (semicolon or comma will exit):";
+	cout << "Enter username (semicolon or comma will exit): ";
 	cin >> username;
 	cin.clear();
 	cin.ignore(10000, '\n');
@@ -1328,7 +1447,7 @@ bool APIC::login(int n, APIC apic) {
 		menu1(apic);
 
 	//read password
-	cout << "Enter password (semicolon or comma will exit) ";
+	cout << "Enter password (semicolon or comma will exit): ";
 	cin >> password;
 	cin.clear();
 	cin.ignore(10000, '\n');
@@ -1362,6 +1481,7 @@ bool APIC::login(int n, APIC apic) {
 }
 
 bool APIC::regist(APIC apic) {
+	cout << endl << "----REGISTING NEW ACCOUNT----" << endl;
 	string username, password, institution, areaCompleteString;
 	string date = "1/1/1900";
 	vector<string> areaVector;
@@ -1371,7 +1491,7 @@ bool APIC::regist(APIC apic) {
 	stringstream ss;
 	stringstream areaComplete;
 
-	cout << endl << "Select your username (semicolon or comma will exit): "<< endl;
+	cout << "Select your username (semicolon or comma will exit): "<< endl;
 	cout << "Username: ";
 	cin >> username;
 	cin.clear();
@@ -1440,7 +1560,7 @@ bool APIC::regist(APIC apic) {
 		} while (exit == false);
 
 		do {//repeat until user don't want to add more areas
-			cout << endl << "Please choose the area you want to add: " << endl;
+			cout << endl << "Please choose the area you want to add (Semicolon will return back): " << endl;
 			cout << "Your area: ";
 			cin >> area;
 			cin.clear();
@@ -1450,7 +1570,7 @@ bool APIC::regist(APIC apic) {
 			stringToUpper(area);
 
 			if (checkArea(area)) {
-				cout << endl << "Now please pick a sub area: " << endl;
+				cout << endl << "Now please pick a sub area (Semicolon will return back): " << endl;
 				printSubArea(area);
 				cout << endl;
 				cout << "Your sub area: ";
@@ -1548,7 +1668,7 @@ void APIC::payQuota(APIC apic) {
 		}
 	}
 
-	cout << "Thank you!" << endl;
+	cout << endl<< "Thank you!" << endl;
 	cout << "Your quota has been paid. You have now full access! " << endl;
 }
 
@@ -1645,36 +1765,34 @@ void APIC::updateEventSupportSS(EventSummerSchool eventSS) {
 
 void APIC::menu1(APIC apic) {
 
-	int pick;
+	char pick;
 	do {
-		cout << "Welcome! " << endl;
+		cout << "---Welcome!---" << endl << endl;
 		cout << "Please press:" << endl;
 		cout << "1: To login" << endl;
 		cout << "2: To register" << endl;
 		cout << "0: To exit" << endl;
 		cout << "Your pick: ";
-		cin >> pick;
-		if (cin.fail())
-			cout << "ERROR! Wrong input! " << endl;
+		cin >> pick;;
 		cin.clear();
 		cin.ignore(10000, '\n');
 
 		switch (pick) {
-		case 1:
+		case '1':
 			//login
 			apic.login(3, apic);
 			break;
-		case 2: {
+		case '2': {
 			//register
 			bool reg = apic.regist(apic);
 			if (reg) {
-				cout << "Success! Account created!" << endl;
+				cout << endl << "Success! Account created!" << endl;
 				cout << "Pay your annual quota for full access!" << endl << endl;
 			}
 			pick = 3;
 			break;
 		}
-		case 0:
+		case '0':
 			//closes program
 			cout << "See you soon!" << endl;
 			exit(EXIT_FAILURE);
@@ -1686,9 +1804,9 @@ void APIC::menu1(APIC apic) {
 }
 
 void APIC::menu2(APIC apic) {
-	int pick;
+	char pick;
 	do {//exits when input is valid
-		cout << endl << "Welcome " << apic.getUserLogged().getLoginName()<< endl;
+		cout << endl << "------Welcome " << apic.getUserLogged().getLoginName()<< "------" << endl;
 		cout << "Please choose what you want to do next: " << endl;
 		cout << "1: Go to search and print menu" << endl;
 		cout << "2: Go to the message menu" << endl;
@@ -1704,31 +1822,31 @@ void APIC::menu2(APIC apic) {
 		cin.ignore(10000, '\n');
 
 		switch (pick) {
-		case 1: {
+		case '1': {
 			menuSearch(apic);
 			break;
 		}
-		case 2: {
+		case '2': {
 			menuMessages(apic);
 			break;
 		}
-		case 3: {
+		case '3': {
 			menuEvents(apic);
 			break;
 		}
 
-		case 4: {
+		case '4': {
 			payQuota(apic);
 			break;
 		}
-		case 5: {
+		case '5': {
 			cout << endl;
 			//logs out the user
 			apic.getUserLogged().logout();
 			menu1(apic);
 			break;
 		}
-		case 0: {
+		case '0': {
 			cout << "See you soon!" << endl;
 			//closes program
 			exit(EXIT_FAILURE);
@@ -1739,7 +1857,7 @@ void APIC::menu2(APIC apic) {
 }
 
 void APIC::menuSearch(APIC apic) {
-	int pick;
+	char pick;
 
 	do {//exits when input is valid
 		cout << endl << "----Search and Print Menu----" << endl;
@@ -1750,11 +1868,12 @@ void APIC::menuSearch(APIC apic) {
 		cout << "4: Search for all users in an area" << endl;
 		cout << "5: Search for all users in an subarea" << endl;
 		cout << "6: Search for an event" << endl;
-		cout << "7: Print all areas of interest with complete information " << endl;
-		cout << "8: Print all areas of interest, but just siglas " << endl;
+		cout << "7: Print all areas of interest with complete name" << endl;
+		cout << "8: Print all areas of interest, but just acronyms" << endl;
 		cout << "9: Look for the subareas of an area" << endl;
-		cout << "10: Go to previous menu" << endl;
-		cout << "11: To Log Out" << endl;
+		cout << "e: Print complete information for the events " << endl;
+		cout << "x: Go to previous menu" << endl;
+		cout << "z: To Log Out" << endl;
 		cout << "0: To exit" << endl;
 		cout << "Your pick: ";
 		cin >> pick;
@@ -1764,61 +1883,66 @@ void APIC::menuSearch(APIC apic) {
 		cin.ignore(10000, '\n');
 
 		switch (pick) {
-		case 1: {
+		case '1': {
 			printUsers();
 			break;
 		}
-		case 2: {
+		case '2': {
 			printUsersComplete();
 			break;
 		}
-		case 3: {
+		case '3': {
 			searchUser();
 			break;
 		}
-		case 4: {
+		case '4': {
 			cout << endl;
 			searchUserByArea();
 			break;
 		}
-		case 5: {
+		case '5': {
 			cout << endl;
 			searchUserBySubArea();
 			break;
 		}
-		case 6: {
+		case '6': {
 			cout << endl;
 			searchEventByArea();
 			break;
 		}
-		case 7: {
+		case '7': {
 			cout << endl;
 			printAreasFull();
 			break;
 		}
-		case 8: {
+		case '8': {
 			cout << endl;
 			printAreasSiglas();
 			break;
 		}
-		case 9: {
+		case '9': {
 			cout << endl;
 			printSubAreasUser();
 			break;
 		}
-		case 10: {
+		case 'e': {
+			cout << endl;
+			printEvents();
+			break;
+		}
+		case 'x': {
 			//returns to previous menu
 			return;
 			break;
 		}
-		case 11: {
+		case 'z': {
 			cout << endl;
 			//logs out the user
 			apic.getUserLogged().logout();
 			menu1(apic);
 			break;
 		}
-		case 0: {
+		case '0': {
 			cout << "See you soon!" << endl;
 			//leaves program
 			exit(EXIT_FAILURE);
@@ -1829,7 +1953,7 @@ void APIC::menuSearch(APIC apic) {
 }
 
 void APIC::menuEvents(APIC apic) {
-	int pick;
+	char pick;
 
 	do {//exits when input is valid
 		cout << endl << "----Events Menu----" << endl;
@@ -1848,37 +1972,37 @@ void APIC::menuEvents(APIC apic) {
 		cin.ignore(10000, '\n');
 
 		switch (pick) {
-		case 1: {
+		case '1': {
 			if(checkStatusC(apic))
 				createEvent(apic);
 			else
 				cout << endl << "Sorry! You need to be contributor to create an event! " << endl;
 			break;
 		}
-		case 2: {
+		case '2': {
 			if(checkStatusC(apic))
 				promoteEvent(apic);
 			else
 				cout << endl << "Sorry! You need to be contributor to promote an event! " << endl;
 			break;
 		}
-		case 3: {
+		case '3': {
 			searchEventByArea();
 			break;
 		}
-		case 4: {
+		case '4': {
 			//returns to previous menu
 			return;
 			break;
 		}
-		case 5: {
+		case '5': {
 			cout << endl;
 			//logs out user
 			apic.getUserLogged().logout();
 			menu1(apic);
 			break;
 		}
-		case 0: {
+		case '0': {
 			cout << "See you soon!" << endl;
 			exit(EXIT_FAILURE);
 			break;
@@ -1888,7 +2012,7 @@ void APIC::menuEvents(APIC apic) {
 }
 
 void APIC::menuMessages(APIC apic) {
-	int pick;
+	char pick;
 
 	do {
 		cout << endl << "----Messages Menu----" << endl;
@@ -1906,33 +2030,33 @@ void APIC::menuMessages(APIC apic) {
 		cin.ignore(10000, '\n');
 
 		switch (pick) {
-		case 1: {
+		case '1': {
 			if(checkStatusC(apic))
 				createMessage(apic);
 			else
 				cout << endl << "Sorry! You need to be contributor to send messages! " << endl;
 			break;
 		}
-		case 2: {
+		case '2': {
 			if(checkStatusI(apic))
 				cout << endl << "Sorry! Your account is inactive! You can't receive messages! " << endl;
 			else
 				printMessage(apic.getUserLogged());
 			break;
 		}
-		case 3: {
+		case '3': {
 			//returns to previous menu
 			return;
 			break;
 		}
-		case 4: {
+		case '4': {
 			cout << endl;
 			//logs user out
 			apic.getUserLogged().logout();
 			menu1(apic);
 			break;
 		}
-		case 0: {
+		case '0': {
 			cout << "See you soon!" << endl;
 			exit(EXIT_FAILURE);
 			break;

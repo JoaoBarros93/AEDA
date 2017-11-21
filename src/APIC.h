@@ -47,20 +47,24 @@ public:
 	void insertEventC(EventConference newEventC);
 	void insertMessage(Message newMessage);
 
-	//SEARCH AND PRINT FUNCTIONS
-	void searchUser();
-	void searchEventByArea();
-	void searchUserByArea();
-	void searchUserBySubArea();
+	//PRINT FUNCTIONS
 	void printUsers();
 	void printUsersComplete();
 	void printAreasFull();
+	void printAreasAndSub();
 	void printAreasSiglas();
 	void printSubAreasUser();
 	void printSubArea(string area);
 	void printEventsC();
 	void printEventsSS();
 	void printMessage(User receiver);
+	void printEvents();
+
+	//SEARCH FUNCTIONS
+	void searchUser();
+	void searchEventByArea();
+	void searchUserByArea();
+	void searchUserBySubArea();
 
 	//CHECK FUNCTIONS
 	bool checkArea(string area);

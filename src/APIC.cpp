@@ -543,13 +543,12 @@ bool APIC::checkSubArea(string subArea) {
 
 bool APIC::findSemicolon(string stringToSearch) {
 	//if it finds semicolon in string returns true else returns false
-	basic_string<char>::size_type index1, index2, index3;
+	basic_string<char>::size_type index1, index2;
 	static const basic_string<char>::size_type npos = -1;
 	index1 = stringToSearch.find(';');
 	index2 = stringToSearch.find(',');
-	index3 = stringToSearch.find(' ');
 
-	if (index1 != npos || index2 != npos || index3 != npos) {
+	if (index1 != npos || index2 != npos) {
 		cout << "You returned back! " << endl << endl;
 		return true;
 	} else
@@ -653,11 +652,9 @@ void APIC::createSummerSchool(APIC apic) {
 			cout << "Area not found! Please try again! " << endl;
 	} while (exit == 0);
 
-	cout << "Where will the event take place? (semicolon will return back. Please do not use spaces) " << endl;
+	cout << "Where will the event take place? (semicolon will return back) " << endl;
 	cout << "Local: ";
-	cin >> local;
-	cin.clear();
-	cin.ignore(10000, '\n');
+	getline(cin,local);
 	//try to find ";" in local
 	if (findSemicolon(local))
 		return;
@@ -682,11 +679,10 @@ void APIC::createSummerSchool(APIC apic) {
 
 	Date date(dateString);
 
-	cout << "Please insert a title for the event: (Semicolon will return back. Please do not use spaces) " << endl;
+	cout << "Please insert a title for the event: (Semicolon will return back) " << endl;
 	cout << "Title: ";
-	cin >> title;
-	cin.clear();
-	cin.ignore(10000, '\n');
+	getline(cin,title);
+
 	//try to find ";" in title
 	if (findSemicolon(title))
 		return;
@@ -792,9 +788,7 @@ void APIC::createConference(APIC apic) {
 
 	cout << "Where will the event take place? (Semicolon will return back)"<< endl;
 	cout << "Local: ";
-	cin >> local;
-	cin.clear();
-	cin.ignore(10000, '\n');
+	getline(cin,local);
 
 	//try to find ";" in local
 	if (findSemicolon(local))
@@ -821,11 +815,10 @@ void APIC::createConference(APIC apic) {
 
 	Date date(dateString);
 
-	cout << "Please insert a title for the event: (Semicolon will return back. Please do not use spaces) " << endl;
+	cout << "Please insert a title for the event: (Semicolon will return back) " << endl;
 	cout << "Title: ";
-	cin >> title;
-	cin.clear();
-	cin.ignore(10000, '\n');
+	getline(cin,title);
+
 	//try to find ";" in title
 	if (findSemicolon(title))
 		return;
@@ -1740,7 +1733,8 @@ void APIC::promoteEvent(APIC apic) {
 
 
 void APIC::updateEventSupportC(EventConference eventC) {
-	if (eventC.getUsersPromoted().size() >= 2 && eventC.getSupport() == 0) {
+	//updates to 1 if more than 50 people show
+	if (eventC.getUsersPromoted().size() >= 2 && eventC.getSupport() == 0 && eventC.getNumberPeople()>=50) {
 		for (unsigned int i = 0; i < eventsC.size(); i++) {
 			if (eventsC[i].getTitle() == eventC.getTitle()) {
 				eventsC[i].setSupport(1);
@@ -1750,7 +1744,8 @@ void APIC::updateEventSupportC(EventConference eventC) {
 }
 
 void APIC::updateEventSupportSS(EventSummerSchool eventSS) {
-	if (eventSS.getUsersPromoted().size() >= 2 && eventSS.getSupport() == 0) {
+	//updates to 1 if more than 2 formers
+	if (eventSS.getUsersPromoted().size() >= 2 && eventSS.getSupport() == 0 && eventSS.getFormers().size()>2) {
 		for (unsigned int i = 0; i < eventsSS.size(); i++) {
 			if (eventsSS[i].getTitle() == eventSS.getTitle()) {
 				eventsSS[i].setSupport(1);
